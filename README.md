@@ -172,43 +172,125 @@ Items/Collections.
 
 ### Reference Date Type
 
-`symptom_onset` | `diagnosis` | `notification` | `death` | `specimen_collection` | `other`
+Which event the Item’s temporal properties (`datetime` / `start_datetime`–`end_datetime`) refer to.
+
+| Value | Meaning |
+| --- | --- |
+| `symptom_onset` | Date of first symptoms (or equivalent clinical onset) |
+| `diagnosis` | Date of clinical or laboratory diagnosis |
+| `notification` | Date the case was notified to the surveillance system |
+| `death` | Date of death |
+| `specimen_collection` | Date the specimen / sample was collected |
+| `other` | Another reference event; explain in `description` or `health:ascertainment_note` |
 
 ### Temporal Resolution
 
-`event` | `daily` | `weekly` | `monthly` | `quarterly` | `annual` | `multi_year` | `other`
+Reporting or aggregation cadence of the values in the asset.
+
+| Value | Meaning |
+| --- | --- |
+| `event` | Individual events or irregular timestamps (not a fixed calendar bin) |
+| `daily` | One value (or row set) per calendar day |
+| `weekly` | One value per epidemiological or calendar week (see `health:week_system`) |
+| `monthly` | One value per calendar month |
+| `quarterly` | One value per calendar quarter |
+| `annual` | One value per calendar year |
+| `multi_year` | Values aggregated or labelled over a span longer than one year |
+| `other` | Another cadence; explain in `description` |
 
 ### Week System
 
-`iso_8601` | `ecdc` | `mmwr`
+Week-numbering convention when `health:temporal_resolution` is `weekly`.
+
+| Value | Meaning |
+| --- | --- |
+| `iso_8601` | ISO 8601 weeks (Monday start; week 1 contains the year’s first Thursday) |
+| `ecdc` | ECDC / TESSy epidemiological weeks (aligned with ISO 8601 in current ECDC practice; declare explicitly for clarity) |
+| `mmwr` | US CDC MMWR weeks (Sunday start; week 1 rules differ from ISO) |
 
 ### Access Level
 
-`open` | `registered` | `controlled_access` | `consortium_only`
+How a consumer may obtain the asset (independent of privacy class).
+
+| Value | Meaning |
+| --- | --- |
+| `open` | Freely downloadable without registration |
+| `registered` | Requires account / registration, but no further approval gate |
+| `controlled_access` | Requires application, DUA, or equivalent approval before download |
+| `consortium_only` | Restricted to a named project, consortium, or partnership |
 
 ### GDPR Status
 
-`open_data` | `aggregated_published` | `anonymised` | `pseudonymised` | `restricted_identifiable`
+Privacy / identifiability class of the **payload** (not only the licence). GDPR-oriented labels; usable as a general privacy class outside the EU.
+
+| Value | Meaning |
+| --- | --- |
+| `open_data` | Non-personal or otherwise published as open data with no residual identifiability concern under the publisher’s assessment |
+| `aggregated_published` | Aggregated statistics released publicly (may still need disclosure control — see suppression fields) |
+| `anonymised` | Treated as anonymised for release under the publisher’s assessment (irreversible under that assessment) |
+| `pseudonymised` | Identifiers replaced or coded; re-identification possible with additional information held separately |
+| `restricted_identifiable` | Contains personal data or is otherwise not safe for open release |
 
 ### Suppression Method
 
-`none` | `primary_only` | `complementary` | `rounding` | `k_anonymity`
+Statistical disclosure control applied to counts (or equivalent cells) when `gdpr_status` is `aggregated_published` or `anonymised`.
+
+| Value | Meaning |
+| --- | --- |
+| `none` | No cell suppression or other disclosure control applied |
+| `primary_only` | Small cells below `minimum_cell_size` are suppressed (e.g. set to NA); no further complementary steps |
+| `complementary` | Primary suppression plus secondary/complementary suppression to prevent differencing |
+| `rounding` | Values are rounded (or banded) to reduce disclosure risk |
+| `k_anonymity` | Release satisfies a stated *k*-anonymity (or similar) threshold; document *k* in `description` if not obvious |
 
 ### Surveillance Type
 
-`universal_mandatory` | `sentinel` | `voluntary` | `passive` | `active` | `other`
+How cases or observations enter the reporting system.
+
+| Value | Meaning |
+| --- | --- |
+| `universal_mandatory` | Legal or regulatory duty to report all qualifying cases in the covered population |
+| `sentinel` | Selected sites / providers report; not designed as complete population coverage |
+| `voluntary` | Reporting is voluntary (no mandate) |
+| `passive` | Relies on routine notifications without active case-finding |
+| `active` | Includes active case-finding, outreach, or stimulated reporting |
+| `other` | Another ascertainment design; explain in `description` or `health:ascertainment_note` |
+
+`passive` / `active` may combine with the others (e.g. mandatory + passive). Prefer the primary
+organisational design in this field and put nuance in `health:ascertainment_note`.
 
 ### Outbreak Phase
 
-`endemic_baseline` | `emerging` | `epidemic_peak` | `declining` | `unknown`
+Epidemic context for the period covered by the Item (publisher judgement).
+
+| Value | Meaning |
+| --- | --- |
+| `endemic_baseline` | Transmission at expected endemic / baseline levels |
+| `emerging` | Early growth or first detection relative to baseline |
+| `epidemic_peak` | Around the peak of an epidemic wave |
+| `declining` | Clear decline from a recent peak |
+| `unknown` | Phase not assessed or not applicable |
 
 ### Revision Status
 
-`provisional` | `revised` | `final`
+Lifecycle of this catalogue snapshot relative to the source series.
+
+| Value | Meaning |
+| --- | --- |
+| `provisional` | Subject to change; counts or extents may be revised |
+| `revised` | Updated after an earlier provisional (or prior revised) release |
+| `final` | Publisher treats this snapshot as final for the stated period |
 
 ### Uncertainty Type
 
-`none` | `prediction_interval` | `posterior_variance` | `ensemble_spread`
+How uncertainty is represented on `model_output` (or similar prediction) assets.
+
+| Value | Meaning |
+| --- | --- |
+| `none` | Point estimate / single surface only; no uncertainty layer in this Item |
+| `prediction_interval` | Frequentist-style prediction or confidence intervals (or equivalent interval rasters/tables) |
+| `posterior_variance` | Bayesian posterior variance / credible intervals (or equivalent) |
+| `ensemble_spread` | Spread across ensemble members (e.g. SD, range, quantiles of members) |
 
 ### Reporting Lag Object
 
