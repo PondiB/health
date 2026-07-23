@@ -1,0 +1,107 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "e4warning-wnv-host-competence-prevalence",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2026-05-04T00:00:00Z",
+    "title": "WNV host competence and host prevalence",
+    "description": "Open tables of West Nile virus avian host competence and prevalence metrics. Used as One Health covariates for WNV risk modelling. CC-BY-4.0.",
+    "health:data_type": "covariate",
+    "health:disease_codes": [
+      "A92.3"
+    ],
+    "health:pathogen_taxon_ids": [
+      "11082"
+    ],
+    "health:spatial_unit": "other",
+    "health:temporal_resolution": "other",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "e4warning_zenodo",
+    "health:data_version": "2026-05-04",
+    "health:data_as_of": "2026-05-04T00:00:00Z",
+    "health:revision_status": "final",
+    "sci:doi": "10.5281/zenodo.20024101",
+    "sci:citation": "Richter-Boix, A., Rodríguez Grabalosa, J., & Bogdanović, N. (2026). WNV host competence and host prevalence [Data set]. Zenodo. https://doi.org/10.5281/zenodo.20024101"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-host-wnv-competence.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.20024101"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/20024101"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    }
+  ],
+  "assets": {
+    "competence": {
+      "href": "https://zenodo.org/api/records/20024101/files/WNV_Host_Competence.xlsx/content",
+      "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "title": "WNV host competence (XLSX)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 628909,
+      "health:data_type": "covariate"
+    },
+    "prevalence": {
+      "href": "https://zenodo.org/api/records/20024101/files/WNV_Host_Prevalence.xlsx/content",
+      "type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "title": "WNV host prevalence (XLSX)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 2736950,
+      "health:data_type": "covariate"
+    }
+  }
+}

@@ -1,13 +1,14 @@
 name: Check Markdown and Examples
 on: [push, pull_request]
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - uses: actions/checkout@v4
+          cache: npm
       - run: |
-          npm install
+          npm ci
           npm test

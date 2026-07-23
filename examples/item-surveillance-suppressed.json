@@ -1,0 +1,107 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "nuts3-case-counts-primary-suppressed-sample",
+  "bbox": [
+    6.6,
+    44,
+    9.3,
+    46.5
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          6.6,
+          44
+        ],
+        [
+          9.3,
+          44
+        ],
+        [
+          9.3,
+          46.5
+        ],
+        [
+          6.6,
+          46.5
+        ],
+        [
+          6.6,
+          44
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2021-03-22T00:00:00Z",
+    "end_datetime": "2021-03-28T23:59:59Z",
+    "title": "Illustrative NUTS-3 case counts with primary cell suppression",
+    "description": "Fixture demonstrating disclosure-control fields: primary suppression replaces counts below the minimum cell size (5) with NA. Not an official surveillance release — use for schema/docs only. National ECDC aggregates elsewhere correctly use minimum_cell_size 1 with suppression_method none.",
+    "health:data_type": "case_reports",
+    "health:disease_codes": [
+      "U07.1"
+    ],
+    "health:pathogen_taxon_ids": [
+      "2697049"
+    ],
+    "health:spatial_unit": "NUTS3",
+    "health:spatial_unit_version": "NUTS2021",
+    "health:reference_date_type": "notification",
+    "health:temporal_resolution": "weekly",
+    "health:week_system": "iso_8601",
+    "health:spatial_coverage": [
+      "ITA"
+    ],
+    "health:access_level": "open",
+    "health:gdpr_status": "aggregated_published",
+    "health:minimum_cell_size": 5,
+    "health:suppression_method": "primary_only",
+    "health:data_source_system": "health_extension_fixture",
+    "health:surveillance_type": "universal_mandatory",
+    "health:sex_disaggregated": false,
+    "health:data_version": "fixture-primary-suppress-v1",
+    "health:data_as_of": "2021-03-29T00:00:00Z",
+    "health:revision_status": "final",
+    "sci:citation": "Health Extension examples. Illustrative NUTS-3 primary-suppression fixture (not an official institute release)."
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-surveillance-suppressed.json"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    },
+    {
+      "rel": "related",
+      "type": "application/geo+json",
+      "href": "https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2021_4326_LEVL_3.geojson",
+      "title": "Eurostat GISCO NUTS 2021 level-3 regions (join geometry)"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/assets/nuts3-case-counts-primary-suppressed-sample.csv",
+      "type": "text/csv",
+      "title": "Primary-suppressed NUTS-3 weekly counts (fixture)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 254,
+      "file:checksum": "1220eff65e92feb5125060908f8bbbdb3ae94899dd387c233e34917c89816adc04e7",
+      "health:data_type": "case_reports"
+    }
+  }
+}

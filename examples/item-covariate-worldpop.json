@@ -1,0 +1,93 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "e4warning-2020-worldpop-population-total",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2020-01-01T00:00:00Z",
+    "title": "WorldPop human population total 2020 (E4Warning packaging)",
+    "description": "Gridded total human population (WorldPop) packaged for E4Warning/MOOD analyses. Typical denominator layer for incidence rates. CC-BY-4.0.",
+    "health:data_type": "covariate",
+    "health:spatial_unit": "grid",
+    "health:temporal_resolution": "annual",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "worldpop",
+    "health:data_version": "2020",
+    "health:data_as_of": "2024-05-09T00:00:00Z",
+    "health:revision_status": "final",
+    "proj:code": "EPSG:4326",
+    "sci:doi": "10.5281/zenodo.11161484",
+    "sci:citation": "Wint, W. (2024). E4warning_2020_Worldpop_HumanPopulationTotal [Data set]. Zenodo. https://doi.org/10.5281/zenodo.11161484"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-covariate-worldpop.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.11161484"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/11161484"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://zenodo.org/api/records/11161484/files/E4warning_2020_PopulationTotal.zip/content",
+      "type": "application/zip",
+      "title": "Population total raster(s) (ZIP)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 186286213,
+      "health:data_type": "covariate"
+    }
+  }
+}
