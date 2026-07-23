@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Header scope now lists Asset alongside Item and Collection (fields were already valid on assets).
+
 ### Deprecated
 
 ### Removed
