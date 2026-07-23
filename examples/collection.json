@@ -2,72 +2,146 @@
   "stac_version": "1.0.0",
   "stac_extensions": [
     "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json",
-    "https://stac-extensions.github.io/template/v1.0.0/schema.json"
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
   ],
   "type": "Collection",
-  "id": "collection",
-  "title": "A title",
-  "description": "A description",
-  "license": "Apache-2.0",
+  "id": "ecdc-covid19-eueea-daily",
+  "title": "ECDC COVID-19 cases and deaths — EU/EEA daily (open data)",
+  "description": "Daily COVID-19 case and death counts by EU/EEA country from the ECDC Open Data portal. National aggregates of notified cases (not line lists). ECDC states that, unless otherwise indicated, publicly available material it owns is licensed CC BY 4.0.",
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "COVID-19",
+    "SARS-CoV-2",
+    "ECDC",
+    "surveillance",
+    "EU-EEA"
+  ],
   "extent": {
     "spatial": {
       "bbox": [
         [
-          172.9,
-          1.3,
-          173,
-          1.4
+          -31.3,
+          27.6,
+          40.2,
+          71.2
         ]
       ]
     },
     "temporal": {
       "interval": [
         [
-          "2015-06-23T00:00:00Z",
-          null
+          "2020-02-04T00:00:00Z",
+          "2022-10-23T23:59:59Z"
         ]
       ]
     }
   },
-  "template:new_field": "test",
-  "template:xyz": {
-    "x": 1,
-    "y": 2,
-    "z": 3
-  },
-  "template:another_one": [
-    1,
-    2,
-    3
+  "health:data_type": "case_reports",
+  "health:disease_codes": [
+    "U07.1"
   ],
-  "assets": {
-    "example": {
-      "href": "https://example.com/examples/file.xyz",
-      "template:new_field": "test"
+  "health:pathogen_taxon_ids": [
+    "2697049"
+  ],
+  "health:spatial_unit": "national",
+  "health:temporal_resolution": "daily",
+  "health:spatial_coverage": [
+    "AUT",
+    "BEL",
+    "BGR",
+    "HRV",
+    "CYP",
+    "CZE",
+    "DNK",
+    "EST",
+    "FIN",
+    "FRA",
+    "DEU",
+    "GRC",
+    "HUN",
+    "ISL",
+    "IRL",
+    "ITA",
+    "LVA",
+    "LIE",
+    "LTU",
+    "LUX",
+    "MLT",
+    "NLD",
+    "NOR",
+    "POL",
+    "PRT",
+    "ROU",
+    "SVK",
+    "SVN",
+    "ESP",
+    "SWE"
+  ],
+  "health:access_level": "open",
+  "health:gdpr_status": "aggregated_published",
+  "health:minimum_cell_size": 1,
+  "health:suppression_method": "none",
+  "health:data_source_system": "ecdc_opendata",
+  "health:surveillance_type": "universal_mandatory",
+  "health:data_controller": "European Centre for Disease Prevention and Control (ECDC)",
+  "sci:citation": "European Centre for Disease Prevention and Control. Data on the daily number of new reported COVID-19 cases and deaths by EU/EEA country. https://opendata.ecdc.europa.eu/covid19/nationalcasedeath_eueea_daily_ei/",
+  "summaries": {
+    "health:data_type": [
+      "case_reports"
+    ],
+    "health:disease_codes": [
+      "U07.1"
+    ],
+    "health:gdpr_status": [
+      "aggregated_published"
+    ],
+    "datetime": {
+      "minimum": "2020-02-04T00:00:00Z",
+      "maximum": "2022-10-23T23:59:59Z"
     }
   },
   "item_assets": {
     "data": {
+      "type": "text/csv",
       "roles": [
         "data"
       ],
-      "template:new_field": "test"
-    }
-  },
-  "summaries": {
-    "datetime": {
-      "minimum": "2015-06-23T00:00:00Z",
-      "maximum": "2019-07-10T13:44:56Z"
+      "title": "Daily national case and death CSV",
+      "health:data_type": "case_reports"
     }
   },
   "links": [
     {
-      "href": "https://example.com/examples/collection.json",
-      "rel": "self"
+      "rel": "self",
+      "type": "application/json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/collection.json"
     },
     {
-      "href": "https://example.com/examples/item.json",
-      "rel": "item"
+      "rel": "root",
+      "type": "application/json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/collection.json"
+    },
+    {
+      "rel": "item",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-surveillance.json",
+      "title": "ECDC COVID-19 EU/EEA daily CSV Item"
+    },
+    {
+      "rel": "about",
+      "href": "https://opendata.ecdc.europa.eu/covid19/nationalcasedeath_eueea_daily_ei/",
+      "title": "ECDC Open Data dataset landing page"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    },
+    {
+      "rel": "license",
+      "href": "https://www.ecdc.europa.eu/en/ecdc-intellectual-property-notices",
+      "title": "ECDC intellectual property notices (states CC BY 4.0 for ECDC-owned public material)"
     }
   ]
 }

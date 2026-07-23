@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://stac-extensions.github.io/template/v1.0.0/schema.json#",
-  "title": "Template Extension",
-  "description": "STAC Template Extension for STAC Items and STAC Collections.",
+  "$id": "https://stac-extensions.github.io/health/v0.1.0/schema.json#",
+  "title": "Health Extension",
+  "description": "STAC Health Extension for geospatial public-health and epidemic-intelligence datasets (outcomes, determinants, and model outputs).",
   "oneOf": [
     {
-      "$comment": "This is the schema for STAC Items. Remove this object if this extension only applies to Collections.",
+      "$comment": "STAC Items",
       "allOf": [
         {
           "$ref": "#/definitions/stac_extensions"
@@ -24,18 +24,19 @@
             "properties": {
               "allOf": [
                 {
-                  "$comment": "Require fields here for Item Properties.",
                   "required": [
-                    "template:new_field"
+                    "health:data_type"
                   ]
                 },
                 {
                   "$ref": "#/definitions/fields"
+                },
+                {
+                  "$ref": "#/definitions/item_conditionals"
                 }
               ]
             },
             "assets": {
-              "$comment": "This validates the fields in Item Assets, but does not require them.",
               "type": "object",
               "additionalProperties": {
                 "$ref": "#/definitions/fields"
@@ -46,7 +47,7 @@
       ]
     },
     {
-      "$comment": "This is the schema for STAC Collections.",
+      "$comment": "STAC Collections",
       "type": "object",
       "allOf": [
         {
@@ -65,13 +66,9 @@
       ],
       "anyOf": [
         {
-          "$comment": "This is the schema for the top-level fields in a Collection. Remove this if this extension does not define top-level fields for Collections.",
           "allOf": [
             {
-              "$comment": "Require fields here for Collections (top-level).",
-              "required": [
-                "template:new_field"
-              ]
+              "$ref": "#/definitions/require_any_field"
             },
             {
               "$ref": "#/definitions/fields"
@@ -79,7 +76,6 @@
           ]
         },
         {
-          "$comment": "This validates the fields in Collection Assets, but does not require them.",
           "required": [
             "assets"
           ],
@@ -104,7 +100,6 @@
           }
         },
         {
-          "$comment": "This is the schema for the fields in Item Asset Definitions. It doesn't require any fields.",
           "required": [
             "item_assets"
           ],
@@ -129,7 +124,6 @@
           }
         },
         {
-          "$comment": "This is the schema for the fields in Summaries. By default, only checks the existence of the properties, but not the schema of the summaries.",
           "required": [
             "summaries"
           ],
@@ -152,58 +146,412 @@
         "stac_extensions": {
           "type": "array",
           "contains": {
-            "const": "https://stac-extensions.github.io/template/v1.0.0/schema.json"
+            "const": "https://stac-extensions.github.io/health/v0.1.0/schema.json"
           }
         }
       }
     },
     "require_any_field": {
-      "$comment": "Please list all fields here so that we can force the existence of one of them in other parts of the schemas.",
       "anyOf": [
-        {"required": ["template:new_field"]},
-        {"required": ["template:xyz"]},
-        {"required": ["template:another_one"]}
+        {"required": ["health:data_type"]},
+        {"required": ["health:disease_codes"]},
+        {"required": ["health:pathogen_taxon_ids"]},
+        {"required": ["health:spatial_unit"]},
+        {"required": ["health:spatial_unit_version"]},
+        {"required": ["health:reference_date_type"]},
+        {"required": ["health:reporting_lag_days"]},
+        {"required": ["health:temporal_resolution"]},
+        {"required": ["health:week_system"]},
+        {"required": ["health:spatial_coverage"]},
+        {"required": ["health:access_level"]},
+        {"required": ["health:gdpr_status"]},
+        {"required": ["health:minimum_cell_size"]},
+        {"required": ["health:suppression_method"]},
+        {"required": ["health:population_denominator"]},
+        {"required": ["health:vector_species"]},
+        {"required": ["health:sex_disaggregated"]},
+        {"required": ["health:age_bands_available"]},
+        {"required": ["health:completeness_score"]},
+        {"required": ["health:surveillance_type"]},
+        {"required": ["health:case_definition_url"]},
+        {"required": ["health:data_source_system"]},
+        {"required": ["health:ascertainment_note"]},
+        {"required": ["health:data_use_agreement_url"]},
+        {"required": ["health:data_controller"]},
+        {"required": ["health:countermeasures_period"]},
+        {"required": ["health:outbreak_phase"]},
+        {"required": ["health:data_version"]},
+        {"required": ["health:data_as_of"]},
+        {"required": ["health:revision_status"]},
+        {"required": ["health:uncertainty_type"]},
+        {"required": ["health:bias_evaluation_url"]}
+      ]
+    },
+    "data_type": {
+      "type": "string",
+      "enum": [
+        "case_reports",
+        "incidence_rate",
+        "mortality",
+        "mortality_rate",
+        "hospitalisation",
+        "seroprevalence",
+        "syndromic_surveillance",
+        "environmental_sampling",
+        "vector_occurrence",
+        "covariate",
+        "model_output"
+      ]
+    },
+    "gdpr_status": {
+      "type": "string",
+      "enum": [
+        "open_data",
+        "aggregated_published",
+        "anonymised",
+        "pseudonymised",
+        "restricted_identifiable"
       ]
     },
     "fields": {
-      "$comment": "Add your new fields here. Don't require them here, do that above in the corresponding schema.",
       "type": "object",
       "properties": {
-        "template:new_field": {
-          "type": "string"
+        "health:data_type": {
+          "$ref": "#/definitions/data_type"
         },
-        "template:xyz": {
+        "health:disease_codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "health:pathogen_taxon_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "health:spatial_unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:spatial_unit_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:reference_date_type": {
+          "type": "string",
+          "enum": [
+            "symptom_onset",
+            "diagnosis",
+            "notification",
+            "death",
+            "specimen_collection",
+            "other"
+          ]
+        },
+        "health:reporting_lag_days": {
           "type": "object",
+          "description": "Inclusive reporting-lag range in days. max MUST be greater than or equal to min.",
           "required": [
-            "x",
-            "y",
-            "z"
+            "min",
+            "max"
           ],
           "properties": {
-            "x": {
-              "type": "number"
+            "min": {
+              "type": "number",
+              "minimum": 0
             },
-            "y": {
-              "type": "number"
-            },
-            "z": {
-              "type": "number"
+            "max": {
+              "type": "number",
+              "minimum": 0
             }
+          },
+          "additionalProperties": false
+        },
+        "health:temporal_resolution": {
+          "type": "string",
+          "enum": [
+            "event",
+            "daily",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "annual",
+            "multi_year",
+            "other"
+          ]
+        },
+        "health:week_system": {
+          "type": "string",
+          "enum": [
+            "iso_8601",
+            "ecdc",
+            "mmwr"
+          ]
+        },
+        "health:spatial_coverage": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
           }
         },
-        "template:another_one": {
+        "health:access_level": {
+          "type": "string",
+          "enum": [
+            "open",
+            "registered",
+            "controlled_access",
+            "consortium_only"
+          ]
+        },
+        "health:gdpr_status": {
+          "$ref": "#/definitions/gdpr_status"
+        },
+        "health:minimum_cell_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "health:suppression_method": {
+          "type": "string",
+          "enum": [
+            "none",
+            "primary_only",
+            "complementary",
+            "rounding",
+            "k_anonymity"
+          ]
+        },
+        "health:population_denominator": {
+          "type": "object",
+          "required": [
+            "source",
+            "vintage_year"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "vintage_year": {
+              "type": "integer",
+              "minimum": 1900
+            },
+            "value": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        "health:vector_species": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "health:sex_disaggregated": {
+          "type": "boolean"
+        },
+        "health:age_bands_available": {
           "type": "array",
           "items": {
-            "type": "number"
+            "type": "string"
           }
+        },
+        "health:completeness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "health:surveillance_type": {
+          "type": "string",
+          "enum": [
+            "universal_mandatory",
+            "sentinel",
+            "voluntary",
+            "passive",
+            "active",
+            "other"
+          ]
+        },
+        "health:case_definition_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "health:data_source_system": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:ascertainment_note": {
+          "type": "string"
+        },
+        "health:data_use_agreement_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "health:data_controller": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:countermeasures_period": {
+          "type": "boolean"
+        },
+        "health:outbreak_phase": {
+          "type": "string",
+          "enum": [
+            "endemic_baseline",
+            "emerging",
+            "epidemic_peak",
+            "declining",
+            "unknown"
+          ]
+        },
+        "health:data_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:data_as_of": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "health:revision_status": {
+          "type": "string",
+          "enum": [
+            "provisional",
+            "revised",
+            "final"
+          ]
+        },
+        "health:uncertainty_type": {
+          "type": "string",
+          "enum": [
+            "none",
+            "prediction_interval",
+            "posterior_variance",
+            "ensemble_spread"
+          ]
+        },
+        "health:bias_evaluation_url": {
+          "type": "string",
+          "format": "uri"
         }
       },
       "patternProperties": {
-        "^(?!template:)": {
-          "$comment": "Above, change `template` to the prefix of this extension"
-        }
+        "^(?!health:)": {}
       },
       "additionalProperties": false
+    },
+    "item_conditionals": {
+      "allOf": [
+        {
+          "$comment": "Non-covariate Items SHOULD identify disease and/or pathogen.",
+          "if": {
+            "properties": {
+              "health:data_type": {
+                "not": {
+                  "const": "covariate"
+                }
+              }
+            },
+            "required": [
+              "health:data_type"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "health:disease_codes"
+                ]
+              },
+              {
+                "required": [
+                  "health:pathogen_taxon_ids"
+                ]
+              },
+              {
+                "properties": {
+                  "health:data_type": {
+                    "const": "model_output"
+                  }
+                },
+                "required": [
+                  "health:data_type"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "$comment": "Aggregated or anonymised data requires disclosure-control fields.",
+          "if": {
+            "properties": {
+              "health:gdpr_status": {
+                "enum": [
+                  "aggregated_published",
+                  "anonymised"
+                ]
+              }
+            },
+            "required": [
+              "health:gdpr_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "health:minimum_cell_size",
+              "health:suppression_method"
+            ]
+          }
+        },
+        {
+          "$comment": "Weekly series require an explicit week numbering system.",
+          "if": {
+            "properties": {
+              "health:temporal_resolution": {
+                "const": "weekly"
+              }
+            },
+            "required": [
+              "health:temporal_resolution"
+            ]
+          },
+          "then": {
+            "required": [
+              "health:week_system"
+            ]
+          }
+        },
+        {
+          "$comment": "Rates require a versioned population denominator.",
+          "if": {
+            "properties": {
+              "health:data_type": {
+                "enum": [
+                  "incidence_rate",
+                  "mortality_rate"
+                ]
+              }
+            },
+            "required": [
+              "health:data_type"
+            ]
+          },
+          "then": {
+            "required": [
+              "health:population_denominator"
+            ]
+          }
+        }
+      ]
     }
   }
 }

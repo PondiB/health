@@ -1,0 +1,95 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "e4mood-modis-evi-5km-2022",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2022-01-01T00:00:00Z",
+    "end_datetime": "2022-12-31T23:59:59Z",
+    "title": "MODIS Enhanced Vegetation Index 5 km — 2022 (E4/MOOD)",
+    "description": "MODIS EVI time series (5 km) for 2022 from the E4Warning/MOOD Zenodo packaging. Environmental covariate for vector habitat and spillover models. CC-BY-4.0.",
+    "health:data_type": "covariate",
+    "health:spatial_unit": "grid_5km",
+    "health:temporal_resolution": "other",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "modis_evi",
+    "health:data_version": "2022",
+    "health:data_as_of": "2024-05-09T00:00:00Z",
+    "health:revision_status": "final",
+    "proj:code": "EPSG:4326",
+    "sci:doi": "10.5281/zenodo.11164552",
+    "sci:citation": "Wint, W. (2024). 2006_2022_MODIS _EnhancedVegetationIndex [Data set]. Zenodo. https://doi.org/10.5281/zenodo.11164552"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-covariate-modis-evi.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.11164552"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/11164552"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://zenodo.org/api/records/11164552/files/E4moodMOD13c1evi5km16day2022.zip/content",
+      "type": "application/zip",
+      "title": "MODIS EVI 16-day 5 km — 2022 (ZIP)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 56366112,
+      "health:data_type": "covariate"
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.1.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "mood-ixodes-ricinus-spatial-models-2022-2023",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2024-11-18T00:00:00Z",
+    "title": "Spatial models for Ixodes ticks (I. ricinus / I. persulcatus)",
+    "description": "Open spatial suitability / presence–absence model outputs for Ixodes ticks. Relevant to tick-borne encephalitis (TBE) and Lyme risk mapping. CC-BY-4.0.",
+    "health:data_type": "model_output",
+    "health:disease_codes": [
+      "A84",
+      "A69.2"
+    ],
+    "health:vector_species": [
+      "2182588"
+    ],
+    "health:spatial_unit": "grid",
+    "health:temporal_resolution": "other",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "mood_zenodo",
+    "health:uncertainty_type": "none",
+    "health:data_version": "2022_2023",
+    "health:data_as_of": "2024-11-18T00:00:00Z",
+    "health:revision_status": "final",
+    "sci:doi": "10.5281/zenodo.14186816",
+    "sci:citation": "Wint, W. (2024). 2022_2023_SpatialModelVector_Ixodesticks [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14186816"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/develop/examples/item-model-ixodes.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.14186816"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/14186816"
+    },
+    {
+      "rel": "license",
+      "href": "https://creativecommons.org/licenses/by/4.0/",
+      "title": "CC BY 4.0"
+    }
+  ],
+  "assets": {
+    "data_ricinus": {
+      "href": "https://zenodo.org/api/records/14186816/files/allixric1xybal40kjul23MEANbrtrf%20(1).zip/content",
+      "type": "application/zip",
+      "title": "Ixodes ricinus model outputs (ZIP)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 63012238,
+      "health:data_type": "model_output"
+    },
+    "data_persulcatus": {
+      "href": "https://zenodo.org/api/records/14186816/files/ERGOPERSULCATUSMODELPRESABSMAY23%20(2).zip/content",
+      "type": "application/zip",
+      "title": "Ixodes persulcatus model outputs (ZIP)",
+      "roles": [
+        "data"
+      ],
+      "file:size": 302956660,
+      "health:data_type": "model_output"
+    },
+    "thumbnail": {
+      "href": "https://zenodo.org/api/records/14186816/files/Overview_vectors.png/content",
+      "type": "image/png",
+      "title": "Overview figure",
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
