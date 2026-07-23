@@ -3,7 +3,7 @@
 - **Title:** Health
 - **Identifier:** <https://stac-extensions.github.io/health/v0.1.0/schema.json>
 - **Field Name Prefix:** health
-- **Scope:** Item, Collection
+- **Scope:** Item, Collection, Asset
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
 - **Owner**: [@PondiB](https://github.com/PondiB)
 
