@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Definitions (value/meaning tables) for all Health enum fields in the README.
+- Expanded documentation for `health:minimum_cell_size` (count threshold vs geography; interaction with suppression).
 
 ### Changed
 

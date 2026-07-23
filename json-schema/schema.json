@@ -316,7 +316,8 @@
         },
         "health:minimum_cell_size": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Smallest publishable count (or count-equivalent cell) under the publisher's statistical disclosure-control rule. Not a geographic area. Use 1 with suppression_method none when no cell suppression is applied."
         },
         "health:suppression_method": {
           "type": "string",

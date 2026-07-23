@@ -76,7 +76,7 @@ The fields in the table below can be used in these parts of STAC documents:
 | health:spatial_coverage | \[string] | ISO 3166-1 alpha-3 country codes (typically Collection-level). |
 | health:access_level | [Access Level](#access-level) | How the data may be obtained. |
 | health:gdpr_status | [GDPR Status](#gdpr-status) | Privacy / identifiability class of the payload. |
-| health:minimum_cell_size | integer | **REQUIRED** when `gdpr_status` is `aggregated_published` or `anonymised`. Smallest publishable count (or equivalent). |
+| health:minimum_cell_size | integer (≥ 1) | **REQUIRED** when `gdpr_status` is `aggregated_published` or `anonymised`. Threshold used for statistical disclosure control — see [minimum cell size](#healthminimum_cell_size). |
 | health:suppression_method | [Suppression Method](#suppression-method) | **REQUIRED** when `gdpr_status` is `aggregated_published` or `anonymised`. |
 | health:population_denominator | [Population Denominator Object](#population-denominator-object) | **REQUIRED** when `data_type` is `incidence_rate` or `mortality_rate`. |
 | health:vector_species | \[string] | GBIF or NCBI taxon IDs for vector species (vector-borne use cases). |
@@ -129,9 +129,27 @@ ISO weeks, ECDC epi weeks, and CDC MMWR weeks can disagree by up to a week at ye
 `health:gdpr_status` describes the *payload*, not only the licence. Labels are GDPR-oriented (common for EU/EHDS
 catalogues) but the field is usable as a general privacy/identifiability class elsewhere. When data are aggregated or
 anonymised for release, `health:minimum_cell_size` and `health:suppression_method` are required so
-secondary/complementary suppression is explicit. `suppression_method: none` with `minimum_cell_size: 1` means no
-disclosure control was applied (valid for coarse national aggregates). For coarse geometries, also consider the [Anonymized
+disclosure control is explicit. For coarse geometries, also consider the [Anonymized
 Location](https://github.com/stac-extensions/anonymized-location) extension (`anon:size`, `anon:warning`).
+
+##### `health:minimum_cell_size`
+
+The smallest **count** (or count-equivalent cell) the publisher allows to appear in the released table or map.
+It is the threshold used by statistical disclosure control, not a description of the geographic unit size.
+
+- **Unit:** dimensionless integer count of observations/cases (or the same quantity the cells store). It is **not**
+  kilometres, hectares, or population. Geographic coarseness belongs in `health:spatial_unit` / geometry / `anon:`.
+- **Semantics with `health:suppression_method`:**
+  - `primary_only` / `complementary` / `k_anonymity`: cells whose raw count is **strictly below** this value are
+    suppressed, rounded away, or otherwise protected according to the method.
+  - `rounding`: often the rounding base or banding width expressed as a count (document the exact rule in
+    `description` if it is not “round to multiples of *n*”).
+  - `none`: no disclosure control was applied. Use `minimum_cell_size: 1` to mean “every positive count may be
+    published,” which is typical for coarse national aggregates.
+- **Required when:** `gdpr_status` is `aggregated_published` or `anonymised` (schema conditional). Omit both this
+  field and `suppression_method` when those statuses are not used.
+- **Examples in this repo:** ECDC national daily CSV uses `1` + `none` (no small-cell rule). The illustrative
+  NUTS-3 fixture uses `5` + `primary_only` (counts below 5 replaced with NA).
 
 #### Surveillance vintage
 
