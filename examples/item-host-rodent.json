@@ -74,7 +74,7 @@
     {
       "rel": "self",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-host-rodent.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-host-rodent.json"
     }
   ],
   "assets": {

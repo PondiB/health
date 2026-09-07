@@ -61,7 +61,7 @@
     {
       "rel": "self",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-vegetation.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-vegetation.json"
     },
     {
       "rel": "cite-as",
