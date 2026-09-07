@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://stac-extensions.github.io/health/v0.1.0/schema.json#",
   "title": "Health Extension",
-  "description": "STAC Health Extension for geospatial public-health and epidemic-intelligence datasets (outcomes, determinants, and model outputs).",
+  "description": "STAC Health Extension — GEOAI4EI minimalistic profile for geospatial epidemic-intelligence datasets (covariates, vectors, hosts, outcomes, and model outputs).",
   "oneOf": [
     {
       "$comment": "STAC Items",
@@ -156,61 +156,33 @@
         {"required": ["health:data_type"]},
         {"required": ["health:disease_codes"]},
         {"required": ["health:pathogen_taxon_ids"]},
+        {"required": ["health:vector_species"]},
         {"required": ["health:spatial_unit"]},
         {"required": ["health:spatial_unit_version"]},
-        {"required": ["health:reference_date_type"]},
-        {"required": ["health:reporting_lag_days"]},
         {"required": ["health:temporal_resolution"]},
         {"required": ["health:week_system"]},
         {"required": ["health:spatial_coverage"]},
         {"required": ["health:access_level"]},
         {"required": ["health:gdpr_status"]},
-        {"required": ["health:minimum_cell_size"]},
-        {"required": ["health:suppression_method"]},
-        {"required": ["health:population_denominator"]},
-        {"required": ["health:vector_species"]},
-        {"required": ["health:sex_disaggregated"]},
-        {"required": ["health:age_bands_available"]},
-        {"required": ["health:completeness_score"]},
-        {"required": ["health:surveillance_type"]},
-        {"required": ["health:case_definition_url"]},
-        {"required": ["health:data_source_system"]},
-        {"required": ["health:ascertainment_note"]},
-        {"required": ["health:data_use_agreement_url"]},
-        {"required": ["health:data_controller"]},
-        {"required": ["health:countermeasures_period"]},
-        {"required": ["health:outbreak_phase"]},
         {"required": ["health:data_version"]},
+        {"required": ["health:data_source_system"]},
         {"required": ["health:data_as_of"]},
-        {"required": ["health:revision_status"]},
-        {"required": ["health:uncertainty_type"]},
-        {"required": ["health:bias_evaluation_url"]}
+        {"required": ["health:completeness_score"]},
+        {"required": ["health:uncertainty_type"]}
       ]
     },
     "data_type": {
       "type": "string",
       "enum": [
         "case_reports",
-        "incidence_rate",
         "mortality",
+        "incidence_rate",
         "mortality_rate",
-        "hospitalisation",
-        "seroprevalence",
-        "syndromic_surveillance",
-        "environmental_sampling",
         "vector_occurrence",
+        "host_distribution",
         "covariate",
-        "model_output"
-      ]
-    },
-    "gdpr_status": {
-      "type": "string",
-      "enum": [
-        "open_data",
-        "aggregated_published",
-        "anonymised",
-        "pseudonymised",
-        "restricted_identifiable"
+        "model_output",
+        "environmental_sampling"
       ]
     },
     "fields": {
@@ -235,6 +207,14 @@
             "minLength": 1
           }
         },
+        "health:vector_species": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "health:spatial_unit": {
           "type": "string",
           "minLength": 1
@@ -242,36 +222,6 @@
         "health:spatial_unit_version": {
           "type": "string",
           "minLength": 1
-        },
-        "health:reference_date_type": {
-          "type": "string",
-          "enum": [
-            "symptom_onset",
-            "diagnosis",
-            "notification",
-            "death",
-            "specimen_collection",
-            "other"
-          ]
-        },
-        "health:reporting_lag_days": {
-          "type": "object",
-          "description": "Inclusive reporting-lag range in days. max MUST be greater than or equal to min.",
-          "required": [
-            "min",
-            "max"
-          ],
-          "properties": {
-            "min": {
-              "type": "number",
-              "minimum": 0
-            },
-            "max": {
-              "type": "number",
-              "minimum": 0
-            }
-          },
-          "additionalProperties": false
         },
         "health:temporal_resolution": {
           "type": "string",
@@ -312,110 +262,20 @@
           ]
         },
         "health:gdpr_status": {
-          "$ref": "#/definitions/gdpr_status"
-        },
-        "health:minimum_cell_size": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Smallest publishable count (or count-equivalent cell) under the publisher's statistical disclosure-control rule. Not a geographic area. Use 1 with suppression_method none when no cell suppression is applied."
-        },
-        "health:suppression_method": {
           "type": "string",
           "enum": [
-            "none",
-            "primary_only",
-            "complementary",
-            "rounding",
-            "k_anonymity"
-          ]
-        },
-        "health:population_denominator": {
-          "type": "object",
-          "required": [
-            "source",
-            "vintage_year"
-          ],
-          "properties": {
-            "source": {
-              "type": "string",
-              "minLength": 1
-            },
-            "vintage_year": {
-              "type": "integer",
-              "minimum": 1900
-            },
-            "value": {
-              "type": "number"
-            }
-          },
-          "additionalProperties": false
-        },
-        "health:vector_species": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "health:sex_disaggregated": {
-          "type": "boolean"
-        },
-        "health:age_bands_available": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "health:completeness_score": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "health:surveillance_type": {
-          "type": "string",
-          "enum": [
-            "universal_mandatory",
-            "sentinel",
-            "voluntary",
-            "passive",
-            "active",
-            "other"
-          ]
-        },
-        "health:case_definition_url": {
-          "type": "string",
-          "format": "uri"
-        },
-        "health:data_source_system": {
-          "type": "string",
-          "minLength": 1
-        },
-        "health:ascertainment_note": {
-          "type": "string"
-        },
-        "health:data_use_agreement_url": {
-          "type": "string",
-          "format": "uri"
-        },
-        "health:data_controller": {
-          "type": "string",
-          "minLength": 1
-        },
-        "health:countermeasures_period": {
-          "type": "boolean"
-        },
-        "health:outbreak_phase": {
-          "type": "string",
-          "enum": [
-            "endemic_baseline",
-            "emerging",
-            "epidemic_peak",
-            "declining",
-            "unknown"
+            "open_data",
+            "aggregated_published",
+            "anonymised",
+            "pseudonymised",
+            "restricted_identifiable"
           ]
         },
         "health:data_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "health:data_source_system": {
           "type": "string",
           "minLength": 1
         },
@@ -423,13 +283,10 @@
           "type": "string",
           "format": "date-time"
         },
-        "health:revision_status": {
-          "type": "string",
-          "enum": [
-            "provisional",
-            "revised",
-            "final"
-          ]
+        "health:completeness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
         },
         "health:uncertainty_type": {
           "type": "string",
@@ -439,10 +296,6 @@
             "posterior_variance",
             "ensemble_spread"
           ]
-        },
-        "health:bias_evaluation_url": {
-          "type": "string",
-          "format": "uri"
         }
       },
       "patternProperties": {
@@ -452,67 +305,6 @@
     },
     "item_conditionals": {
       "allOf": [
-        {
-          "$comment": "Non-covariate Items SHOULD identify disease and/or pathogen.",
-          "if": {
-            "properties": {
-              "health:data_type": {
-                "not": {
-                  "const": "covariate"
-                }
-              }
-            },
-            "required": [
-              "health:data_type"
-            ]
-          },
-          "then": {
-            "anyOf": [
-              {
-                "required": [
-                  "health:disease_codes"
-                ]
-              },
-              {
-                "required": [
-                  "health:pathogen_taxon_ids"
-                ]
-              },
-              {
-                "properties": {
-                  "health:data_type": {
-                    "const": "model_output"
-                  }
-                },
-                "required": [
-                  "health:data_type"
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "$comment": "Aggregated or anonymised data requires disclosure-control fields.",
-          "if": {
-            "properties": {
-              "health:gdpr_status": {
-                "enum": [
-                  "aggregated_published",
-                  "anonymised"
-                ]
-              }
-            },
-            "required": [
-              "health:gdpr_status"
-            ]
-          },
-          "then": {
-            "required": [
-              "health:minimum_cell_size",
-              "health:suppression_method"
-            ]
-          }
-        },
         {
           "$comment": "Weekly series require an explicit week numbering system.",
           "if": {
@@ -528,27 +320,6 @@
           "then": {
             "required": [
               "health:week_system"
-            ]
-          }
-        },
-        {
-          "$comment": "Rates require a versioned population denominator.",
-          "if": {
-            "properties": {
-              "health:data_type": {
-                "enum": [
-                  "incidence_rate",
-                  "mortality_rate"
-                ]
-              }
-            },
-            "required": [
-              "health:data_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "health:population_denominator"
             ]
           }
         }

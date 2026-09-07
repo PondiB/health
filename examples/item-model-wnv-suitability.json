@@ -1,0 +1,118 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "wnv-culex-suitability-europe-2024",
+  "bbox": [
+    -10,
+    34,
+    45,
+    60
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -10,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          60
+        ],
+        [
+          -10,
+          60
+        ],
+        [
+          -10,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2024-06-01T00:00:00Z",
+    "title": "West Nile Virus Culex suitability — Europe (2024 season)",
+    "description": "Ensemble model output of environmental suitability for Culex pipiens and Culex modestus as WNV vectors across Europe for the 2024 transmission season. Derived from ERA5-Land temperature, VIIRS vegetation, and VectAbundance occurrence data. Uncertainty expressed as ensemble spread across model members.",
+    "health:data_type": "model_output",
+    "health:disease_codes": [
+      "A92.3"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:11082"
+    ],
+    "health:vector_species": [
+      "GBIF:1652237",
+      "GBIF:4525843"
+    ],
+    "health:spatial_unit": "grid_1km",
+    "health:temporal_resolution": "monthly",
+    "health:spatial_coverage": [
+      "ITA",
+      "GRC",
+      "HUN",
+      "ROU",
+      "HRV",
+      "ESP",
+      "FRA",
+      "DEU"
+    ],
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "geoai4ei",
+    "health:uncertainty_type": "ensemble_spread",
+    "health:data_version": "1.0.0",
+    "proj:code": "EPSG:4326",
+    "sci:doi": "10.5281/zenodo.00000000",
+    "sci:citation": "GEOAI4EI Consortium (2024). West Nile Virus Culex suitability model — Europe 2024 [Data set]. Zenodo."
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-model-wnv-suitability.json"
+    },
+    {
+      "rel": "derived_from",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-temperature.json",
+      "title": "ERA5-Land temperature covariate"
+    },
+    {
+      "rel": "derived_from",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-vegetation.json",
+      "title": "VIIRS vegetation covariate"
+    }
+  ],
+  "assets": {
+    "suitability_mean": {
+      "href": "https://example.com/geoai4ei/wnv-culex-suitability-mean-2024.tif",
+      "type": "image/tiff; application=geotiff",
+      "title": "Mean suitability surface (GeoTIFF)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "model_output"
+    },
+    "suitability_sd": {
+      "href": "https://example.com/geoai4ei/wnv-culex-suitability-sd-2024.tif",
+      "type": "image/tiff; application=geotiff",
+      "title": "Ensemble standard deviation (GeoTIFF)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "model_output"
+    }
+  }
+}

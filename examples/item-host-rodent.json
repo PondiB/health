@@ -1,0 +1,91 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "microtus-arvalis-europe-distribution",
+  "bbox": [
+    -10,
+    35,
+    40,
+    65
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -10,
+          35
+        ],
+        [
+          40,
+          35
+        ],
+        [
+          40,
+          65
+        ],
+        [
+          -10,
+          65
+        ],
+        [
+          -10,
+          35
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2020-01-01T00:00:00Z",
+    "end_datetime": "2024-12-31T23:59:59Z",
+    "title": "Common vole (Microtus arvalis) distribution — Europe",
+    "description": "Gridded distribution and relative abundance of the common vole (Microtus arvalis) across Europe. Primary reservoir host for hantavirus (Puumala orthohantavirus) and Francisella tularensis (tularaemia). Population cycles drive epidemic risk in Central and Northern Europe. Produced by CIRAD for GEOAI4EI wildlife-interface scenarios.",
+    "health:data_type": "host_distribution",
+    "health:disease_codes": [
+      "A98.5",
+      "A21"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:1980471",
+      "NCBITaxon:263"
+    ],
+    "health:spatial_unit": "grid_1km",
+    "health:temporal_resolution": "annual",
+    "health:spatial_coverage": [
+      "DEU",
+      "FRA",
+      "POL",
+      "CZE",
+      "AUT",
+      "FIN",
+      "SWE"
+    ],
+    "health:access_level": "consortium_only",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "cirad",
+    "proj:code": "EPSG:4326"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-host-rodent.json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://example.com/geoai4ei/microtus-arvalis-distribution.tif",
+      "type": "image/tiff; application=geotiff",
+      "title": "Common vole distribution surface (GeoTIFF)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "host_distribution"
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "ebola-news-drc-uganda-2026",
+  "bbox": [
+    25,
+    -5,
+    35.5,
+    4.2
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          25,
+          -5
+        ],
+        [
+          35.5,
+          -5
+        ],
+        [
+          35.5,
+          4.2
+        ],
+        [
+          25,
+          4.2
+        ],
+        [
+          25,
+          -5
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2026-01-01T00:00:00Z",
+    "end_datetime": "2026-08-31T23:59:59Z",
+    "title": "Raw Google News Ebola dataset — DRC and Uganda (2026)",
+    "description": "Curated collection of Google News articles reporting Ebola cases and response activities in the Democratic Republic of the Congo, Uganda, and neighbouring countries during the 2026 epidemic. Unofficial event-based surveillance source compiled by CIRAD. Not an official case count — intended for signal detection and situational awareness in the GEOAI4EI direct-person-to-person transmission scenario.",
+    "health:data_type": "case_reports",
+    "health:disease_codes": [
+      "A98.4"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:186538"
+    ],
+    "health:temporal_resolution": "daily",
+    "health:spatial_unit": "national",
+    "health:spatial_coverage": [
+      "COD",
+      "UGA"
+    ],
+    "health:access_level": "consortium_only",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "cirad_google_news",
+    "health:completeness_score": 0.4,
+    "health:data_as_of": "2026-08-15T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-epidemiological-ebola-news.json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://example.com/geoai4ei/ebola-news-drc-uganda-2026.csv",
+      "type": "text/csv",
+      "title": "Curated news events (CSV)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "case_reports"
+    }
+  }
+}

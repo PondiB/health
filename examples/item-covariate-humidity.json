@@ -1,0 +1,87 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "era5-rh-fourier-1km-2010-2023",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2010-01-01T00:00:00Z",
+    "end_datetime": "2023-12-31T23:59:59Z",
+    "title": "ERA5 relative humidity Fourier-processed 1 km — Europe (2010–2023)",
+    "description": "Relative humidity derived from ERA5 reanalysis, Fourier-processed to seasonal components at 1 km resolution over Europe. Humidity is a key driver of mosquito survival and arbovirus transmission dynamics. Relevant for WNV, RVF, and other vector-borne disease risk modelling.",
+    "health:data_type": "covariate",
+    "health:temporal_resolution": "multi_year",
+    "health:spatial_unit": "grid_1km",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "era5_ecmwf",
+    "health:data_version": "1.0.0",
+    "proj:code": "EPSG:4326",
+    "sci:doi": "10.5281/zenodo.14045027",
+    "sci:citation": "Wint, W. et al. (2024). 2010–2023 RelativeHumidity ERA5 Fourier Processed 1k [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14045027"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-humidity.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.14045027"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/14045027",
+      "title": "Zenodo record"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://zenodo.org/api/records/14045027/files/ERA5_rh_fourier_1k.zip/content",
+      "type": "application/zip",
+      "title": "Fourier-processed relative humidity (ZIP of GeoTIFFs)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "covariate"
+    }
+  }
+}

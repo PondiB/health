@@ -1,0 +1,89 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "sus-scrofa-europe-distribution-2024",
+  "bbox": [
+    -10,
+    35,
+    40,
+    70
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -10,
+          35
+        ],
+        [
+          40,
+          35
+        ],
+        [
+          40,
+          70
+        ],
+        [
+          -10,
+          70
+        ],
+        [
+          -10,
+          35
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": "2024-01-01T00:00:00Z",
+    "title": "Wild boar (Sus scrofa) distribution — Europe (updated 2024)",
+    "description": "Updated gridded distribution map of wild boar (Sus scrofa) across Europe at 1 km resolution. Host species relevant for African Swine Fever (ASF), HPAI wildlife-interface, and tick-borne encephalitis (TBE) modelling in GEOAI4EI. Wild boar population density is a key predictor in ASF spread models and a sentinel for tick-borne pathogen circulation.",
+    "health:data_type": "host_distribution",
+    "health:disease_codes": [
+      "A84",
+      "J09"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:11084",
+      "NCBITaxon:102793"
+    ],
+    "health:spatial_unit": "grid_1km",
+    "health:temporal_resolution": "annual",
+    "health:spatial_coverage": [
+      "DEU",
+      "FRA",
+      "ITA",
+      "ESP",
+      "POL",
+      "ROU",
+      "HUN"
+    ],
+    "health:access_level": "consortium_only",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "inrae",
+    "proj:code": "EPSG:4326"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-host-wildboar.json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://example.com/geoai4ei/sus-scrofa-distribution-2024.tif",
+      "type": "image/tiff; application=geotiff",
+      "title": "Wild boar distribution surface (GeoTIFF)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "host_distribution"
+    }
+  }
+}

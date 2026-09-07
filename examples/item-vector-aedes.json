@@ -1,0 +1,102 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "aedes-sticticus-europe-suitability",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2020-01-01T00:00:00Z",
+    "end_datetime": "2024-12-31T23:59:59Z",
+    "title": "Aedes sticticus occurrence and suitability — Europe",
+    "description": "Presence records and modelled environmental suitability for Aedes sticticus across Europe. Flood-water Aedes species relevant for Rift Valley Fever and other arbovirus transmission in the GEOAI4EI wildlife-interface and hemorrhagic VBD scenarios.",
+    "health:data_type": "vector_occurrence",
+    "health:disease_codes": [
+      "A92.4",
+      "A92.3"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:11588",
+      "NCBITaxon:11082"
+    ],
+    "health:vector_species": [
+      "GBIF:1652209"
+    ],
+    "health:spatial_unit": "grid_1km",
+    "health:temporal_resolution": "annual",
+    "health:spatial_coverage": [
+      "DEU",
+      "SWE",
+      "FIN",
+      "FRA",
+      "NOR"
+    ],
+    "health:access_level": "consortium_only",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "gbif",
+    "health:completeness_score": 0.7,
+    "proj:code": "EPSG:4326"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-vector-aedes.json"
+    }
+  ],
+  "assets": {
+    "occurrences": {
+      "href": "https://example.com/geoai4ei/aedes-sticticus-occurrences.csv",
+      "type": "text/csv",
+      "title": "Occurrence point records (CSV)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "vector_occurrence"
+    },
+    "suitability": {
+      "href": "https://example.com/geoai4ei/aedes-sticticus-suitability.tif",
+      "type": "image/tiff; application=geotiff",
+      "title": "Environmental suitability surface (GeoTIFF)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "model_output"
+    }
+  }
+}

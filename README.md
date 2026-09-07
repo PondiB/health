@@ -1,4 +1,4 @@
-# Health Extension Specification
+# Health Extension Specification — GEOAI4EI Profile
 
 - **Title:** Health
 - **Identifier:** <https://stac-extensions.github.io/health/v0.1.0/schema.json>
@@ -6,49 +6,71 @@
 - **Scope:** Item, Collection, Asset
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
 - **Owner**: [@PondiB](https://github.com/PondiB)
+- **Profile:** GEOAI4EI minimalistic (branch `geoai4ei`)
 
-This document explains the Health Extension to the [SpatioTemporal Asset Catalog](https://github.com/radiantearth/stac-spec) (STAC) specification.
-
-It adds domain metadata for **geospatial public-health and epidemic-intelligence** datasets: disease outcomes and surveillance snapshots,
-environmental and socio-demographic determinants (covariates), and model outputs such as risk maps. It is **not** a clinical EHR, imaging, or FHIR
-profile.
+This is a **minimalistic profile** of the [Health Extension](https://github.com/PondiB/health) for the
+[GEOAI4EI](https://geoai4ei.eu/) project. It retains only the fields needed to catalogue the project's
+geospatial epidemic-intelligence datasets — environmental covariates, vector and host distributions,
+epidemiological case data, and model outputs — without the surveillance-vintage, disclosure-control,
+and demographic-disaggregation machinery of the full specification on `main`.
 
 Design principles:
 
-1. **Thin required core** — only `health:data_type` is always required on Items; further fields are conditionally required.
-2. **Reuse before reinvention** — citation, grids, tables, CRS, ML models, file checksums, and geometry anonymization stay in existing extensions (see
-  [Reused extensions](#reused-extensions)). Examples demonstrate a subset; apply additional extensions when the asset type needs them.
-3. **Privacy fields are first-class** — GDPR/access and statistical disclosure-control fields are defined in-schema. They are not always
-  required: national open aggregates may honestly use `minimum_cell_size: 1` with `suppression_method: none`. Use a real suppression method
-  (and cell size ≥ your rule) when small-area cells are protected — see the suppressed fixture example.
-4. **Surveillance is versioned** — provisional counts are revised; vintage fields and byte-pinned assets make nowcasts reproducible.
+1. **Single required field** — only `health:data_type` is required on Items.
+2. **One conditional** — `health:week_system` is required when `temporal_resolution` is `weekly`.
+3. **Reuse before reinvention** — CRS, grids, citations, and tabular schemas stay in existing STAC extensions.
+4. **MOOD metadata alignment** — fields map to the ISO 19115 / INSPIRE subset used by the MOOD GeoNetwork catalogue.
 
-- Examples (real open assets unless noted):
-  - [Collection example](examples/collection.json): ECDC COVID-19 EU/EEA daily open data
-  - [Surveillance Item](examples/item-surveillance.json): ECDC national daily CSV (`aggregated_published`,
-    `suppression_method: none`) with `predecessor-version` link
-  - [Provisional surveillance Item](examples/item-surveillance-provisional.json): byte-pinned CSV truncated at
-    2021-06-30 (`revision_status: provisional`)
-  - [Suppressed fixture](examples/item-surveillance-suppressed.json): illustrative NUTS-3 counts with
-    `minimum_cell_size: 5` and `suppression_method: primary_only` (not an official release)
-  - [NUTS-3 surveillance Item](examples/item-surveillance-nuts.json): Italy PCM-DPC province COVID CSV with
-    `spatial_unit` / `spatial_unit_version` and GISCO NUTS 2021 join link
-  - [Germany surveillance Item](examples/item-surveillance-germany.json): RKI COVID-19 hospitalisation counts by
-    Bundesland (`hospitalisation`, `NUTS1` / `NUTS2021`, commit-pinned)
-  - [Germany incidence Item](examples/item-surveillance-incidence.json): RKI 7-day hospitalisation incidence
-    (`incidence_rate` + `population_denominator`)
-  - [VectAbundance Item](examples/item-vector-vectabundance.json): *Aedes* observation database
-    (`vector_occurrence`)
-  - [WNV host competence Item](examples/item-host-wnv-competence.json): avian host competence / prevalence
-    tables
-  - [Covariate Item](examples/item-covariate.json): ERA5-Land weekly 2 m temperature (Zenodo)
-  - [WorldPop covariate](examples/item-covariate-worldpop.json): gridded population total
-  - [Hospital-density covariate](examples/item-covariate-hospital-density.json): admin-2 hospital density
-  - [MODIS EVI covariate](examples/item-covariate-modis-evi.json): vegetation index 2022
-  - [Model-output Item](examples/item-model-output.json): WNV *Culex* suitability models with MLM metadata
-    and `derived_from` → VectAbundance (Zenodo)
-  - [*Ixodes* model-output Item](examples/item-model-ixodes.json): tick suitability / presence–absence
-    models
+Examples:
+
+- [Collection](examples/collection.json): GEOAI4EI environmental covariates — Europe
+
+Covariates (environmental and climatic determinants from Zenodo / GeoNetwork):
+
+- [Temperature](examples/item-covariate-temperature.json): ERA5-Land daily 2 m air temperature (Zenodo)
+- [Precipitation](examples/item-covariate-precipitation.json): ERA5 precipitation Fourier-processed (Zenodo)
+- [Vegetation](examples/item-covariate-vegetation.json): VIIRS Fourier-processed 1 km — NDVI, EVI, LST (Zenodo)
+- [Humidity](examples/item-covariate-humidity.json): ERA5 relative humidity Fourier-processed (Zenodo)
+- [Wind](examples/item-covariate-wind.json): Wind speed and direction (E4Warning / Zenodo)
+
+Vectors (arthropod occurrence and distribution):
+
+- [*Aedes sticticus*](examples/item-vector-aedes.json): flood-water mosquito occurrence and suitability (RVF, WNV)
+- [*Dermacentor reticulatus*](examples/item-vector-dermacentor.json): ornate cow tick distribution (CCHF, babesiosis)
+
+Hosts (reservoir and sentinel species):
+
+- [Wild boar](examples/item-host-wildboar.json): *Sus scrofa* distribution — TBE, HPAI (INRAE)
+- [Seabirds](examples/item-host-laridae.json): Laridae (gulls, terns) colony density — HPAI (INRAE)
+- [Common vole](examples/item-host-rodent.json): *Microtus arvalis* distribution — Hanta, tularaemia (CIRAD)
+
+Epidemiological (case data and event-based surveillance):
+
+- [RVF cases](examples/item-epidemiological-rvf.json): Rift Valley Fever — Mauritania and Senegal 2025 (CIRAD)
+- [Ebola news](examples/item-epidemiological-ebola-news.json): Google News curated dataset — DRC and Uganda 2026 (CIRAD)
+
+Model outputs:
+
+- [WNV *Culex* suitability](examples/item-model-wnv-suitability.json): West Nile Virus vector suitability — Europe 2024
+
+Disease scenario coverage in examples (via `health:disease_codes` / `health:pathogen_taxon_ids`):
+
+| Disease | ICD-10 | Example(s) |
+| --- | --- | --- |
+| Rift Valley Fever (RVF) | A92.4 | RVF cases, *Aedes* vector |
+| Crimean-Congo Haemorrhagic Fever (CCHF) | A98.0 | *Dermacentor* vector |
+| Ebola | A98.4 | Ebola news |
+| Highly Pathogenic Avian Influenza (HPAI) | J09 | Laridae seabirds, wild boar |
+| West Nile Virus (WNV) | A92.3 | WNV model output, *Aedes* vector |
+| Tick-borne Encephalitis (TBE) | A84 | Wild boar |
+| Hantavirus | A98.5 | Common vole |
+| Monkeypox (MPOX) | B04 | (no example yet — human-to-human scenario) |
+
+Additional links: `SARSCov` is covered by the full spec on `main` (ECDC examples). Tularaemia (`A21`) appears
+alongside hantavirus in the common vole example.
+
+Further resources:
+
 - [JSON Schema](json-schema/schema.json)
 - [Changelog](./CHANGELOG.md)
 
@@ -65,297 +87,141 @@ The fields in the table below can be used in these parts of STAC documents:
 | Field Name | Type | Description |
 | --- | --- | --- |
 | health:data_type | [Data Type](#data-type) | **REQUIRED** (Item). Semantic class of the record. |
-| health:disease_codes | \[string] | ICD-10/11 (or equivalent) disease/condition codes. Conditionally required for non-covariate Items unless `pathogen_taxon_ids` is set (model outputs may omit both when the target is declared elsewhere). |
-| health:pathogen_taxon_ids | \[string] | NCBI Taxonomy IDs (or CURIE form). Alternative or complement to disease codes. |
-| health:spatial_unit | string | Spatial reporting unit (e.g. `NUTS3`, `NUTS2`, `LAU`, `MSOA`, `grid_1km`, `national`). |
-| health:spatial_unit_version | string | Classification vintage of `spatial_unit` (e.g. `NUTS2021`, `NUTS2024`, `LAU2023`). |
-| health:reference_date_type | [Reference Date Type](#reference-date-type) | Which event the temporal properties refer to. |
-| health:reporting_lag_days | [Reporting Lag Object](#reporting-lag-object) | Days between the reference event and data availability. |
-| health:temporal_resolution | [Temporal Resolution](#temporal-resolution) | Reporting cadence. |
+| health:disease_codes | \[string] | ICD-10/11 (or equivalent) disease/condition codes. |
+| health:pathogen_taxon_ids | \[string] | NCBI Taxonomy IDs (or CURIE form). |
+| health:vector_species | \[string] | GBIF or NCBI taxon IDs for vector species. |
+| health:spatial_unit | string | Spatial reporting unit (e.g. `grid_1km`, `NUTS3`, `national`). |
+| health:spatial_unit_version | string | Classification vintage of `spatial_unit` (e.g. `NUTS2021`). |
+| health:temporal_resolution | [Temporal Resolution](#temporal-resolution) | Reporting or aggregation cadence. |
 | health:week_system | [Week System](#week-system) | **REQUIRED** when `temporal_resolution` is `weekly`. |
-| health:spatial_coverage | \[string] | ISO 3166-1 alpha-3 country codes (typically Collection-level). |
+| health:spatial_coverage | \[string] | ISO 3166-1 alpha-3 country codes. |
 | health:access_level | [Access Level](#access-level) | How the data may be obtained. |
 | health:gdpr_status | [GDPR Status](#gdpr-status) | Privacy / identifiability class of the payload. |
-| health:minimum_cell_size | integer (≥ 1) | **REQUIRED** when `gdpr_status` is `aggregated_published` or `anonymised`. Threshold used for statistical disclosure control — see [minimum cell size](#healthminimum_cell_size). |
-| health:suppression_method | [Suppression Method](#suppression-method) | **REQUIRED** when `gdpr_status` is `aggregated_published` or `anonymised`. |
-| health:population_denominator | [Population Denominator Object](#population-denominator-object) | **REQUIRED** when `data_type` is `incidence_rate` or `mortality_rate`. |
-| health:vector_species | \[string] | GBIF or NCBI taxon IDs for vector species (vector-borne use cases). |
-| health:sex_disaggregated | boolean | Whether sex-disaggregated values are present. |
-| health:age_bands_available | \[string] | Age-band labels present in the data. |
-| health:completeness_score | number | Fraction of expected records present (0–1). |
-| health:surveillance_type | [Surveillance Type](#surveillance-type) | How cases are ascertained. |
-| health:case_definition_url | string (URI) | Case-definition document. |
-| health:data_source_system | string | Surveillance system or registry (e.g. `ecdc_tessy`, `ukhsa`, `gbif`). |
-| health:ascertainment_note | string | Known under-reporting or ascertainment bias. |
-| health:data_use_agreement_url | string (URI) | DUA / licence process for controlled data. |
-| health:data_controller | string | Data controller (and optionally DPO contact). |
-| health:countermeasures_period | boolean | Whether NPIs or vaccination campaigns were active in the period. |
-| health:outbreak_phase | [Outbreak Phase](#outbreak-phase) | Epidemic phase label for the period. |
 | health:data_version | string | Publisher version / release tag for this snapshot. |
-| health:data_as_of | string (RFC 3339) | Vintage datetime when this snapshot was current at the source. |
-| health:revision_status | [Revision Status](#revision-status) | provisional / revised / final. |
+| health:data_source_system | string | Source system or registry (e.g. `era5_land`, `gbif`, `cirad`). |
+| health:data_as_of | string (RFC 3339) | Vintage datetime when this snapshot was current. |
+| health:completeness_score | number (0–1) | Fraction of expected records present. |
 | health:uncertainty_type | [Uncertainty Type](#uncertainty-type) | How uncertainty is represented for `model_output` assets. |
-| health:bias_evaluation_url | string (URI) | Bias evaluation (e.g. sex, age, geography) for health AI outputs. |
-
-Collection placement: `health:spatial_coverage`, `health:access_level`, `health:data_use_agreement_url`, and `health:data_controller` are typically
-set on the Collection as catalogue defaults. STAC does **not** inherit Collection properties onto Items — repeat or override fields on each Item
-(and use Collection `summaries` for discovery). Summaries SHOULD list the `health:data_type` and `health:disease_codes` (or pathogen)
-values present in member Items.
-
-### Additional Field Information
-
-#### health:data_type
-
-Discriminates outcome, determinant, and prediction assets so one extension can cover all three without separate namespaces.
-Covariate Items SHOULD use only light health tagging (`data_type` plus optional disease/pathogen keywords for discoverability); grid structure belongs
-in [Datacube](https://github.com/stac-extensions/datacube) / [Raster](https://github.com/stac-extensions/raster) /
-[Projection](https://github.com/stac-extensions/projection).
-
-#### health:disease_codes and health:pathogen_taxon_ids
-
-Prefer stable vocabularies (ICD-10/11, NCBI Taxonomy). At least one of these arrays is required for Items whose `data_type` is not `covariate`, except
-`model_output` Items that declare their target via linked training labels or Collection summaries.
-
-#### health:spatial_unit and health:spatial_unit_version
-
-Administrative units change. A multi-year TESSy series can span several NUTS revisions; omitting the vintage silently breaks joins.
-
-#### health:week_system
-
-ISO weeks, ECDC epi weeks, and CDC MMWR weeks can disagree by up to a week at year boundaries. Required whenever `temporal_resolution` is `weekly`.
-
-#### Privacy and disclosure control
-
-`health:gdpr_status` describes the *payload*, not only the licence. Labels are GDPR-oriented (common for EU/EHDS
-catalogues) but the field is usable as a general privacy/identifiability class elsewhere. When data are aggregated or
-anonymised for release, `health:minimum_cell_size` and `health:suppression_method` are required so
-disclosure control is explicit. For coarse geometries, also consider the [Anonymized
-Location](https://github.com/stac-extensions/anonymized-location) extension (`anon:size`, `anon:warning`).
-
-##### `health:minimum_cell_size`
-
-The smallest **count** (or count-equivalent cell) the publisher allows to appear in the released table or map.
-It is the threshold used by statistical disclosure control, not a description of the geographic unit size.
-
-- **Unit:** dimensionless integer count of observations/cases (or the same quantity the cells store). It is **not**
-  kilometres, hectares, or population. Geographic coarseness belongs in `health:spatial_unit` / geometry / `anon:`.
-- **Semantics with `health:suppression_method`:**
-  - `primary_only` / `complementary` / `k_anonymity`: cells whose raw count is **strictly below** this value are
-    suppressed, rounded away, or otherwise protected according to the method.
-  - `rounding`: often the rounding base or banding width expressed as a count (document the exact rule in
-    `description` if it is not “round to multiples of *n*”).
-  - `none`: no disclosure control was applied. Use `minimum_cell_size: 1` to mean “every positive count may be
-    published,” which is typical for coarse national aggregates.
-- **Required when:** `gdpr_status` is `aggregated_published` or `anonymised` (schema conditional). Omit both this
-  field and `suppression_method` when those statuses are not used.
-- **Examples in this repo:** ECDC national daily CSV uses `1` + `none` (no small-cell rule). The illustrative
-  NUTS-3 fixture uses `5` + `primary_only` (counts below 5 replaced with NA).
-
-#### Surveillance vintage
-
-`health:data_version`, `health:data_as_of`, and `health:revision_status` make each ingested snapshot reproducible.
-Prefer byte-pinned assets (`file:checksum`, commit-pinned or repository-hosted snapshots) over mutable portal URLs for
-provisional vintages. Prefer STAC link relation `predecessor-version` when an Item supersedes an earlier snapshot, and
-`derived_from` from model-output Items back to the surveillance or observation Items used as labels.
-
-#### Model outputs and embeddings
-
-Describe the *model* with the [Machine Learning Model (MLM)](https://github.com/stac-extensions/mlm)
-extension and scientific citations with [Scientific](https://github.com/stac-extensions/scientific).
-This extension only adds health-specific prediction metadata: `health:uncertainty_type` and
-`health:bias_evaluation_url` (set the latter when a bias/fairness evaluation is published).
-
-Geospatial foundation-model **embedding tensors** (dimensions, chip layout, inference runtime, quantization,
-`emb:source-data` / `emb:model` links) are **out of scope** for `health:`. Use the community
-[Embedding extension](https://github.com/geo-embeddings/embeddings-stac-specification) (`emb:` prefix;
-Proposal) together with MLM for the encoder. A health catalogue Item that *uses* embeddings as features
-still declares `health:data_type` (`covariate` or `model_output` as appropriate) and links to the embedding
-Items/Collections.
 
 ### Data Type
 
 | Value | Meaning |
 | --- | --- |
-| `case_reports` | Case counts or line-list aggregates |
-| `incidence_rate` | Incidence rates (requires population denominator) |
+| `case_reports` | Case counts, line-list aggregates, or event-based reports |
 | `mortality` | Death counts |
-| `mortality_rate` | Mortality rates (requires population denominator) |
-| `hospitalisation` | Hospital admission / occupancy metrics |
-| `seroprevalence` | Serological prevalence |
-| `syndromic_surveillance` | Syndromic indicators |
-| `environmental_sampling` | Pathogen detection in environment |
-| `vector_occurrence` | Vector presence / abundance |
+| `incidence_rate` | Incidence rates |
+| `mortality_rate` | Mortality rates |
+| `vector_occurrence` | Vector presence / abundance / suitability |
+| `host_distribution` | Host species distribution, density, or suitability |
 | `covariate` | Environmental or socio-demographic determinant |
 | `model_output` | Predicted risk, nowcast, or similar product |
-
-### Reference Date Type
-
-Which event the Item’s temporal properties (`datetime` / `start_datetime`–`end_datetime`) refer to.
-
-| Value | Meaning |
-| --- | --- |
-| `symptom_onset` | Date of first symptoms (or equivalent clinical onset) |
-| `diagnosis` | Date of clinical or laboratory diagnosis |
-| `notification` | Date the case was notified to the surveillance system |
-| `death` | Date of death |
-| `specimen_collection` | Date the specimen / sample was collected |
-| `other` | Another reference event; explain in `description` or `health:ascertainment_note` |
+| `environmental_sampling` | Pathogen detection in environment |
 
 ### Temporal Resolution
 
-Reporting or aggregation cadence of the values in the asset.
-
 | Value | Meaning |
 | --- | --- |
-| `event` | Individual events or irregular timestamps (not a fixed calendar bin) |
-| `daily` | One value (or row set) per calendar day |
-| `weekly` | One value per epidemiological or calendar week (see `health:week_system`) |
+| `event` | Individual events or irregular timestamps |
+| `daily` | One value per calendar day |
+| `weekly` | One value per epidemiological or calendar week |
 | `monthly` | One value per calendar month |
 | `quarterly` | One value per calendar quarter |
 | `annual` | One value per calendar year |
-| `multi_year` | Values aggregated or labelled over a span longer than one year |
+| `multi_year` | Values over a span longer than one year (e.g. Fourier-processed composites) |
 | `other` | Another cadence; explain in `description` |
 
 ### Week System
 
-Week-numbering convention when `health:temporal_resolution` is `weekly`.
-
 | Value | Meaning |
 | --- | --- |
-| `iso_8601` | ISO 8601 weeks (Monday start; week 1 contains the year’s first Thursday) |
-| `ecdc` | ECDC / TESSy epidemiological weeks (aligned with ISO 8601 in current ECDC practice; declare explicitly for clarity) |
-| `mmwr` | US CDC MMWR weeks (Sunday start; week 1 rules differ from ISO) |
+| `iso_8601` | ISO 8601 weeks (Monday start) |
+| `ecdc` | ECDC epidemiological weeks |
+| `mmwr` | US CDC MMWR weeks (Sunday start) |
 
 ### Access Level
-
-How a consumer may obtain the asset (independent of privacy class).
 
 | Value | Meaning |
 | --- | --- |
 | `open` | Freely downloadable without registration |
-| `registered` | Requires account / registration, but no further approval gate |
-| `controlled_access` | Requires application, DUA, or equivalent approval before download |
-| `consortium_only` | Restricted to a named project, consortium, or partnership |
+| `registered` | Requires account / registration |
+| `controlled_access` | Requires application or DUA before download |
+| `consortium_only` | Restricted to a named project or partnership |
 
 ### GDPR Status
 
-Privacy / identifiability class of the **payload** (not only the licence). GDPR-oriented labels; usable as a general privacy class outside the EU.
-
 | Value | Meaning |
 | --- | --- |
-| `open_data` | Non-personal or otherwise published as open data with no residual identifiability concern under the publisher’s assessment |
-| `aggregated_published` | Aggregated statistics released publicly (may still need disclosure control — see suppression fields) |
-| `anonymised` | Treated as anonymised for release under the publisher’s assessment (irreversible under that assessment) |
-| `pseudonymised` | Identifiers replaced or coded; re-identification possible with additional information held separately |
-| `restricted_identifiable` | Contains personal data or is otherwise not safe for open release |
-
-### Suppression Method
-
-Statistical disclosure control applied to counts (or equivalent cells) when `gdpr_status` is `aggregated_published` or `anonymised`.
-
-| Value | Meaning |
-| --- | --- |
-| `none` | No cell suppression or other disclosure control applied |
-| `primary_only` | Small cells below `minimum_cell_size` are suppressed (e.g. set to NA); no further complementary steps |
-| `complementary` | Primary suppression plus secondary/complementary suppression to prevent differencing |
-| `rounding` | Values are rounded (or banded) to reduce disclosure risk |
-| `k_anonymity` | Release satisfies a stated *k*-anonymity (or similar) threshold; document *k* in `description` if not obvious |
-
-### Surveillance Type
-
-How cases or observations enter the reporting system.
-
-| Value | Meaning |
-| --- | --- |
-| `universal_mandatory` | Legal or regulatory duty to report all qualifying cases in the covered population |
-| `sentinel` | Selected sites / providers report; not designed as complete population coverage |
-| `voluntary` | Reporting is voluntary (no mandate) |
-| `passive` | Relies on routine notifications without active case-finding |
-| `active` | Includes active case-finding, outreach, or stimulated reporting |
-| `other` | Another ascertainment design; explain in `description` or `health:ascertainment_note` |
-
-`passive` / `active` may combine with the others (e.g. mandatory + passive). Prefer the primary
-organisational design in this field and put nuance in `health:ascertainment_note`.
-
-### Outbreak Phase
-
-Epidemic context for the period covered by the Item (publisher judgement).
-
-| Value | Meaning |
-| --- | --- |
-| `endemic_baseline` | Transmission at expected endemic / baseline levels |
-| `emerging` | Early growth or first detection relative to baseline |
-| `epidemic_peak` | Around the peak of an epidemic wave |
-| `declining` | Clear decline from a recent peak |
-| `unknown` | Phase not assessed or not applicable |
-
-### Revision Status
-
-Lifecycle of this catalogue snapshot relative to the source series.
-
-| Value | Meaning |
-| --- | --- |
-| `provisional` | Subject to change; counts or extents may be revised |
-| `revised` | Updated after an earlier provisional (or prior revised) release |
-| `final` | Publisher treats this snapshot as final for the stated period |
+| `open_data` | Non-personal or published as open data |
+| `aggregated_published` | Aggregated statistics released publicly |
+| `anonymised` | Treated as anonymised for release |
+| `pseudonymised` | Identifiers replaced; re-identification possible with additional info |
+| `restricted_identifiable` | Contains personal data; not safe for open release |
 
 ### Uncertainty Type
 
-How uncertainty is represented on `model_output` (or similar prediction) assets.
-
 | Value | Meaning |
 | --- | --- |
-| `none` | Point estimate / single surface only; no uncertainty layer in this Item |
-| `prediction_interval` | Frequentist-style prediction or confidence intervals (or equivalent interval rasters/tables) |
-| `posterior_variance` | Bayesian posterior variance / credible intervals (or equivalent) |
-| `ensemble_spread` | Spread across ensemble members (e.g. SD, range, quantiles of members) |
+| `none` | Point estimate only |
+| `prediction_interval` | Prediction or confidence intervals |
+| `posterior_variance` | Bayesian posterior variance / credible intervals |
+| `ensemble_spread` | Spread across ensemble members |
 
-### Reporting Lag Object
+## MOOD Metadata Crosswalk
 
-| Field Name | Type | Description |
-| --- | --- | --- |
-| min | number | **REQUIRED**. Minimum lag in days. |
-| max | number | **REQUIRED**. Maximum lag in days (`max` MUST be ≥ `min`). |
+The MOOD project metadata requirements (ISO 19115 / INSPIRE subset from the GeoNetwork catalogue)
+map to STAC fields as follows:
 
-### Population Denominator Object
-
-| Field Name | Type | Description |
-| --- | --- | --- |
-| source | string | **REQUIRED**. Population dataset or statistic (e.g. `eurostat`, `worldpop`). |
-| vintage_year | integer | **REQUIRED**. Reference year of the population figures. |
-| value | number | Optional scalar denominator when a single value applies. |
-
-## Relation types
-
-Use STAC-native link relations rather than custom health relation types:
-
-| Type | Description |
+| MOOD attribute | STAC / extension field |
 | --- | --- |
-| predecessor-version | Prior surveillance snapshot superseded by this Item |
-| successor-version | Newer revision of this snapshot |
-| derived_from | Model-output or processed Item derived from this Item |
-| cite-as | Canonical citation landing page (with `sci:` fields) |
+| Title | `title` (core STAC) |
+| Abstract | `description` (core STAC) |
+| Spatial resolution | `health:spatial_unit` or `proj:transform` |
+| Temporal resolution | `health:temporal_resolution` |
+| Temporal extent | `start_datetime` / `end_datetime` (core STAC) |
+| Data unit | `description` or `cube:variables` |
+| CRS (EPSG) | `proj:code` (Projection extension) |
+| Download and links | `assets` + `links` (core STAC) |
+| Categories / Keywords | `keywords` (Collection) or `description` |
+| Status | `health:data_version` |
+| Update frequency | `health:temporal_resolution` |
+| Format | Asset `type` (media type) |
+| Lineage | `description` or Processing extension |
+| Contact | `health:data_source_system` or Collection `providers` |
+| Identifier | `id` (core STAC) |
 
 ## Reused extensions
 
 | Concern | Extension | Notes |
 | --- | --- | --- |
-| Citation / DOI | [scientific](https://github.com/stac-extensions/scientific) | `sci:doi`, `sci:citation`, `sci:publications` |
-| Class labels | [classification](https://github.com/stac-extensions/classification) | Risk categories, outbreak-phase codings in rasters |
-| Tabular / GeoParquet schema | [table](https://github.com/stac-extensions/table) | Column names and dtypes |
-| Multi-dimensional arrays | [datacube](https://github.com/stac-extensions/datacube) | `cube:dimensions` / variables |
+| Citation / DOI | [scientific](https://github.com/stac-extensions/scientific) | `sci:doi`, `sci:citation` |
 | CRS / grid | [projection](https://github.com/stac-extensions/projection) | `proj:code`, shape, transform |
+| Multi-dimensional arrays | [datacube](https://github.com/stac-extensions/datacube) | `cube:dimensions` / variables |
+| Tabular schema | [table](https://github.com/stac-extensions/table) | Column names and dtypes |
 | File size / checksum | [file](https://github.com/stac-extensions/file) | `file:checksum`, size |
-| Processing lineage | [processing](https://github.com/stac-extensions/processing) | Processing graph / facility |
-| Auth to assets | [authentication](https://github.com/stac-extensions/authentication) | Controlled-access download flows |
-| Coarse geometry | [anonymized-location](https://github.com/stac-extensions/anonymized-location) | `anon:size`, `anon:warning` |
-| ML model cards / runtime | [mlm](https://github.com/stac-extensions/mlm) | Model identity, artifacts, training refs |
-| Geospatial embeddings | [emb (Embedding)](https://github.com/geo-embeddings/embeddings-stac-specification) | FM embedding products (`emb:dimensions`, chip layout, inference provenance); do not fold into `health:` |
+| ML model cards | [mlm](https://github.com/stac-extensions/mlm) | Model identity, artifacts, training refs |
+| Item asset definitions | [item-assets](https://github.com/stac-extensions/item-assets) | Collection-level asset templates |
 
-## HealthDCAT-AP / EHDS
+## Differences from the full specification (`main`)
 
-Catalogues that also publish HealthDCAT-AP / EHDS secondary-use records can map from these fields (and core STAC) in a companion profile. That
-crosswalk is **not** part of this JSON Schema. Pin the HealthDCAT-AP version used by any catalogue export in the deploying project's documentation.
+This profile **removes** the following fields (available on `main` for surveillance-heavy use cases):
+
+- Surveillance vintage: `health:reference_date_type`, `health:reporting_lag_days`, `health:revision_status`
+- Disclosure control: `health:minimum_cell_size`, `health:suppression_method`
+- Demographic: `health:population_denominator`, `health:sex_disaggregated`, `health:age_bands_available`
+- Surveillance: `health:surveillance_type`, `health:case_definition_url`, `health:ascertainment_note`
+- Governance: `health:data_use_agreement_url`, `health:data_controller`
+- Context: `health:countermeasures_period`, `health:outbreak_phase`
+- AI fairness: `health:bias_evaluation_url`
+
+This profile **adds**:
+
+- `host_distribution` to the `data_type` enum (species distribution and suitability maps).
+
+This profile **relaxes**:
+
+- Conditional requirement for `disease_codes` or `pathogen_taxon_ids` on non-covariate Items (now optional).
+- Conditional requirement for `minimum_cell_size` and `suppression_method` on aggregated/anonymised data (fields removed).
+- Conditional requirement for `population_denominator` on rate types (field removed).
 
 ## Contributing
 

@@ -1,0 +1,86 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "rvf-cases-mauritania-senegal-2025",
+  "bbox": [
+    -17.6,
+    12.3,
+    -4.8,
+    27.3
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -17.6,
+          12.3
+        ],
+        [
+          -4.8,
+          12.3
+        ],
+        [
+          -4.8,
+          27.3
+        ],
+        [
+          -17.6,
+          27.3
+        ],
+        [
+          -17.6,
+          12.3
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2025-01-01T00:00:00Z",
+    "end_datetime": "2025-12-31T23:59:59Z",
+    "title": "Rift Valley Fever human and animal cases — Mauritania and Senegal (2025)",
+    "description": "Reported human and animal RVF cases during the 2025 epidemic in Mauritania and Senegal. Official case notification data compiled by CIRAD. Access is restricted pending publication and data use agreement.",
+    "health:data_type": "case_reports",
+    "health:disease_codes": [
+      "A92.4"
+    ],
+    "health:pathogen_taxon_ids": [
+      "NCBITaxon:11588"
+    ],
+    "health:spatial_unit": "national",
+    "health:temporal_resolution": "weekly",
+    "health:week_system": "iso_8601",
+    "health:spatial_coverage": [
+      "MRT",
+      "SEN"
+    ],
+    "health:access_level": "controlled_access",
+    "health:gdpr_status": "pseudonymised",
+    "health:data_source_system": "cirad",
+    "health:data_version": "1.0.0",
+    "proj:code": "EPSG:4326"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-epidemiological-rvf.json"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://example.com/geoai4ei/rvf-cases-mrt-sen-2025.csv",
+      "type": "text/csv",
+      "title": "Weekly case counts by country (CSV)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "case_reports"
+    }
+  }
+}

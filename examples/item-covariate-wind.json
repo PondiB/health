@@ -1,0 +1,87 @@
+{
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+  ],
+  "type": "Feature",
+  "id": "wind-speed-direction-2005-2018",
+  "bbox": [
+    -25,
+    34,
+    45,
+    72
+  ],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -25,
+          34
+        ],
+        [
+          45,
+          34
+        ],
+        [
+          45,
+          72
+        ],
+        [
+          -25,
+          72
+        ],
+        [
+          -25,
+          34
+        ]
+      ]
+    ]
+  },
+  "properties": {
+    "datetime": null,
+    "start_datetime": "2005-01-01T00:00:00Z",
+    "end_datetime": "2018-12-31T23:59:59Z",
+    "title": "Wind speed and direction — Europe (2005–2018)",
+    "description": "Gridded wind speed and direction layers over Europe. Wind patterns influence mosquito dispersal, pathogen aerosol transport, and avian migration routes relevant to HPAI and WNV spillover scenarios.",
+    "health:data_type": "covariate",
+    "health:temporal_resolution": "multi_year",
+    "health:spatial_unit": "grid_1km",
+    "health:access_level": "open",
+    "health:gdpr_status": "open_data",
+    "health:data_source_system": "e4warning",
+    "health:data_version": "1.0.0",
+    "proj:code": "EPSG:4326",
+    "sci:doi": "10.5281/zenodo.11182081",
+    "sci:citation": "Wint, W. et al. (2024). 2005–2018 Wind Speed Direction [Data set]. Zenodo. https://doi.org/10.5281/zenodo.11182081"
+  },
+  "links": [
+    {
+      "rel": "self",
+      "type": "application/geo+json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-wind.json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.5281/zenodo.11182081"
+    },
+    {
+      "rel": "about",
+      "href": "https://zenodo.org/records/11182081",
+      "title": "Zenodo record"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "https://zenodo.org/api/records/11182081/files/wind_speed_direction.zip/content",
+      "type": "application/zip",
+      "title": "Wind speed and direction layers (ZIP of GeoTIFFs)",
+      "roles": [
+        "data"
+      ],
+      "health:data_type": "covariate"
+    }
+  }
+}
