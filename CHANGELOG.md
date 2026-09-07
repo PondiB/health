@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- GEOAI4EI minimalistic profile (branch `geoai4ei`): 16-field subset of the full specification.
+- Lean 16-field schema aligned with MOOD / GEOAI4EI metadata requirements.
 - `host_distribution` value in the `data_type` enum for species distribution and suitability maps.
 - MOOD metadata crosswalk table mapping ISO 19115 / INSPIRE attributes to STAC fields.
 - Thirteen GEOAI4EI examples covering all MOOD data types:
@@ -24,11 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Schema trimmed to 16 optional/conditional fields (from 30+ on `main`).
-- Only one conditional requirement remains: `week_system` when `temporal_resolution` is `weekly`.
-- Relaxed: `disease_codes` / `pathogen_taxon_ids` no longer conditionally required on non-covariate Items.
-- `data_type` enum reduced to 9 values relevant to GEOAI4EI (dropped `hospitalisation`,
-  `seroprevalence`, `syndromic_surveillance`).
+- Schema streamlined to 16 fields with one required (`data_type`) and one conditional (`week_system`).
+- `data_type` enum: 9 values covering covariates, vectors, hosts, epi, and model outputs.
+- Full MOOD metadata crosswalk table (ISO 19115 / INSPIRE to STAC).
 
 ### Removed
 

@@ -1,4 +1,4 @@
-# Health Extension Specification — GEOAI4EI Profile
+# Health Extension Specification
 
 - **Title:** Health
 - **Identifier:** <https://stac-extensions.github.io/health/v0.1.0/schema.json>
@@ -6,20 +6,23 @@
 - **Scope:** Item, Collection, Asset
 - **Extension [Maturity Classification](https://github.com/radiantearth/stac-spec/tree/master/extensions/README.md#extension-maturity):** Proposal
 - **Owner**: [@PondiB](https://github.com/PondiB)
-- **Profile:** GEOAI4EI minimalistic (branch `geoai4ei`)
 
-This is a **minimalistic profile** of the [Health Extension](https://github.com/PondiB/health) for the
-[GEOAI4EI](https://geoai4ei.eu/) project. It retains only the fields needed to catalogue the project's
-geospatial epidemic-intelligence datasets — environmental covariates, vector and host distributions,
-epidemiological case data, and model outputs — without the surveillance-vintage, disclosure-control,
-and demographic-disaggregation machinery of the full specification on `main`.
+This document explains the Health Extension to the [SpatioTemporal Asset Catalog](https://github.com/radiantearth/stac-spec)
+(STAC) specification.
+
+It adds domain metadata for **geospatial epidemic-intelligence** datasets: environmental and climatic covariates,
+vector and host species distributions, epidemiological case data, and model outputs such as risk maps.
+The metadata requirements are aligned with the ISO 19115 / INSPIRE subset used by the
+[MOOD](https://mood-h2020.eu/) GeoNetwork catalogue and the [GEOAI4EI](https://geoai4ei.eu/) project.
 
 Design principles:
 
 1. **Single required field** — only `health:data_type` is required on Items.
 2. **One conditional** — `health:week_system` is required when `temporal_resolution` is `weekly`.
 3. **Reuse before reinvention** — CRS, grids, citations, and tabular schemas stay in existing STAC extensions.
-4. **MOOD metadata alignment** — fields map to the ISO 19115 / INSPIRE subset used by the MOOD GeoNetwork catalogue.
+4. **MOOD metadata alignment** — fields map to the ISO 19115 / INSPIRE metadata attributes
+   (title, abstract, spatial resolution, temporal resolution, CRS, lineage, etc.) used across
+   the MOOD and GEOAI4EI data catalogues.
 
 Examples:
 
@@ -66,8 +69,7 @@ Disease scenario coverage in examples (via `health:disease_codes` / `health:path
 | Hantavirus | A98.5 | Common vole |
 | Monkeypox (MPOX) | B04 | (no example yet — human-to-human scenario) |
 
-Additional links: `SARSCov` is covered by the full spec on `main` (ECDC examples). Tularaemia (`A21`) appears
-alongside hantavirus in the common vole example.
+Tularaemia (`A21`) appears alongside hantavirus in the common vole example.
 
 Further resources:
 
@@ -175,18 +177,25 @@ map to STAC fields as follows:
 | --- | --- |
 | Title | `title` (core STAC) |
 | Abstract | `description` (core STAC) |
+| Overview | `thumbnail` asset role (core STAC) |
 | Spatial resolution | `health:spatial_unit` or `proj:transform` |
 | Temporal resolution | `health:temporal_resolution` |
 | Temporal extent | `start_datetime` / `end_datetime` (core STAC) |
 | Data unit | `description` or `cube:variables` |
+| Data type (format) | Asset `type` (media type) |
 | CRS (EPSG) | `proj:code` (Projection extension) |
 | Download and links | `assets` + `links` (core STAC) |
-| Categories / Keywords | `keywords` (Collection) or `description` |
+| Categories | `keywords` (Collection) |
+| Other keywords | `keywords` (Collection) or `description` |
+| Language | `description` (note in text) |
 | Status | `health:data_version` |
 | Update frequency | `health:temporal_resolution` |
-| Format | Asset `type` (media type) |
+| Representation type | Asset `type` (media type) + `roles` |
+| Scale | `proj:transform` or `health:spatial_unit` |
+| Format | Asset `type` (media type, e.g. `image/tiff; application=geotiff`) |
 | Lineage | `description` or Processing extension |
-| Contact | `health:data_source_system` or Collection `providers` |
+| Contact | Collection `providers` or `health:data_source_system` |
+| Metadata language | `description` (note in text) |
 | Identifier | `id` (core STAC) |
 
 ## Reused extensions
@@ -200,28 +209,6 @@ map to STAC fields as follows:
 | File size / checksum | [file](https://github.com/stac-extensions/file) | `file:checksum`, size |
 | ML model cards | [mlm](https://github.com/stac-extensions/mlm) | Model identity, artifacts, training refs |
 | Item asset definitions | [item-assets](https://github.com/stac-extensions/item-assets) | Collection-level asset templates |
-
-## Differences from the full specification (`main`)
-
-This profile **removes** the following fields (available on `main` for surveillance-heavy use cases):
-
-- Surveillance vintage: `health:reference_date_type`, `health:reporting_lag_days`, `health:revision_status`
-- Disclosure control: `health:minimum_cell_size`, `health:suppression_method`
-- Demographic: `health:population_denominator`, `health:sex_disaggregated`, `health:age_bands_available`
-- Surveillance: `health:surveillance_type`, `health:case_definition_url`, `health:ascertainment_note`
-- Governance: `health:data_use_agreement_url`, `health:data_controller`
-- Context: `health:countermeasures_period`, `health:outbreak_phase`
-- AI fairness: `health:bias_evaluation_url`
-
-This profile **adds**:
-
-- `host_distribution` to the `data_type` enum (species distribution and suitability maps).
-
-This profile **relaxes**:
-
-- Conditional requirement for `disease_codes` or `pathogen_taxon_ids` on non-covariate Items (now optional).
-- Conditional requirement for `minimum_cell_size` and `suppression_method` on aggregated/anonymised data (fields removed).
-- Conditional requirement for `population_denominator` on rate types (field removed).
 
 ## Contributing
 

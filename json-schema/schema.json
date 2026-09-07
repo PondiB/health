@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://stac-extensions.github.io/health/v0.1.0/schema.json#",
   "title": "Health Extension",
-  "description": "STAC Health Extension — GEOAI4EI minimalistic profile for geospatial epidemic-intelligence datasets (covariates, vectors, hosts, outcomes, and model outputs).",
+  "description": "STAC Health Extension for geospatial epidemic-intelligence datasets (covariates, vectors, hosts, outcomes, and model outputs).",
   "oneOf": [
     {
       "$comment": "STAC Items",
