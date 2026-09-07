@@ -210,6 +210,147 @@ map to STAC fields as follows:
 | ML model cards | [mlm](https://github.com/stac-extensions/mlm) | Model identity, artifacts, training refs |
 | Item asset definitions | [item-assets](https://github.com/stac-extensions/item-assets) | Collection-level asset templates |
 
+## Python (PySTAC) Usage
+
+PySTAC reads and writes `health:` fields without any library changes — they are stored as plain
+dictionary entries in `item.properties`. No fork or plugin is needed.
+
+```python
+import pystac
+
+# Read an Item and access health fields
+item = pystac.Item.from_file("examples/item-covariate-temperature.json")
+print(item.properties["health:data_type"])           # "covariate"
+print(item.properties["health:temporal_resolution"])  # "daily"
+
+# Create a new Item with health fields
+new_item = pystac.Item(
+    id="era5-soil-moisture-weekly-eu",
+    geometry={"type": "Polygon", "coordinates": [[[-25,34],[45,34],[45,72],[-25,72],[-25,34]]]},
+    bbox=[-25, 34, 45, 72],
+    datetime=None,
+    properties={
+        "start_datetime": "2020-01-01T00:00:00Z",
+        "end_datetime": "2024-12-31T23:59:59Z",
+        "health:data_type": "covariate",
+        "health:temporal_resolution": "weekly",
+        "health:week_system": "iso_8601",
+        "health:spatial_unit": "grid_1km",
+        "health:access_level": "open",
+    },
+)
+new_item.stac_extensions = [
+    "https://stac-extensions.github.io/health/v0.1.0/schema.json"
+]
+
+# Validate against the JSON Schema
+item.validate()
+
+# Filter a list of Items by health fields
+def search_by_health(items, data_type=None, disease_code=None, country=None):
+    results = items
+    if data_type:
+        results = [i for i in results if i.properties.get("health:data_type") == data_type]
+    if disease_code:
+        results = [i for i in results if disease_code in (i.properties.get("health:disease_codes") or [])]
+    if country:
+        results = [i for i in results if country in (i.properties.get("health:spatial_coverage") or [])]
+    return results
+```
+
+**pystac-client** works the same way for searching STAC APIs — `health:` fields are queryable
+if the API backend supports them (e.g. `stac-fastapi` with the filter extension):
+
+```python
+from pystac_client import Client
+
+client = Client.open("https://your-stac-api.example.com")
+results = client.search(
+    collections=["geoai4ei-covariates-europe"],
+    filter="health:data_type = 'covariate' AND health:temporal_resolution = 'daily'",
+    filter_lang="cql2-text",
+)
+for item in results.items():
+    print(item.id, item.properties["health:data_type"])
+```
+
+See [`examples/pystac_usage.py`](examples/pystac_usage.py) for a full runnable script.
+
+## LLM Integration
+
+The Health extension schema is designed to be machine-readable for LLM-powered search and
+cataloguing workflows. There are three integration patterns:
+
+### 1. Structured search via tool use
+
+Give the LLM the field names and enum values as a tool definition. The LLM translates
+natural-language queries into structured filters:
+
+```text
+User: "Find precipitation data for France and Germany"
+
+LLM tool call → search_stac(
+    data_type="covariate",
+    spatial_coverage=["FRA", "DEU"],
+    keywords=["precipitation"]
+)
+```
+
+The schema's controlled vocabularies (`data_type`, `access_level`, `temporal_resolution`)
+map directly to tool parameters with enum constraints.
+
+### 2. Metadata generation from descriptions
+
+An LLM can populate `health:` fields from a dataset's free-text description:
+
+```json
+Input:  "MODIS vegetation index composites for tick habitat modelling in Sweden"
+
+Output: {
+    "health:data_type": "covariate",
+    "health:spatial_coverage": ["SWE"],
+    "health:data_source_system": "modis",
+    "health:access_level": "open"
+}
+```
+
+Feed the LLM the Data Type enum table and MOOD crosswalk as context to produce
+valid field values.
+
+### 3. Schema as system prompt context
+
+When building an agent that manages a STAC catalogue, include the field table and
+enum values in the system prompt. The 16-field schema is compact enough to fit
+without excessive token overhead:
+
+```python
+HEALTH_SCHEMA_CONTEXT = """
+health:data_type (REQUIRED): one of case_reports, mortality, incidence_rate,
+  mortality_rate, vector_occurrence, host_distribution, covariate,
+  model_output, environmental_sampling
+health:disease_codes: ICD-10/11 codes, e.g. ["A92.3"] for WNV
+health:pathogen_taxon_ids: NCBI Taxonomy IDs, e.g. ["NCBITaxon:11082"]
+health:vector_species: GBIF/NCBI taxon IDs for vectors
+health:spatial_unit: grid_1km, NUTS3, national, etc.
+health:temporal_resolution: event, daily, weekly, monthly, annual, multi_year
+health:week_system: iso_8601, ecdc, mmwr (required when weekly)
+health:spatial_coverage: ISO 3166-1 alpha-3 codes, e.g. ["DEU", "FRA"]
+health:access_level: open, registered, controlled_access, consortium_only
+health:gdpr_status: open_data, aggregated_published, anonymised,
+  pseudonymised, restricted_identifiable
+health:data_version: publisher version string
+health:data_source_system: source registry (era5_land, gbif, cirad)
+health:data_as_of: RFC 3339 snapshot datetime
+health:completeness_score: 0-1 fraction
+health:uncertainty_type: none, prediction_interval, posterior_variance,
+  ensemble_spread
+"""
+```
+
+The disease scenario coverage table (RVF, CCHF, Ebola, HPAI, WNV, TBE, Hanta, MPOX)
+and the ICD-10 / NCBI Taxonomy mappings in the examples serve as few-shot references
+for LLMs populating or querying `health:disease_codes` and `health:pathogen_taxon_ids`.
+
 ## Contributing
 
 All contributions are subject to the
