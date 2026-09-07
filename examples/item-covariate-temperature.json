@@ -55,7 +55,14 @@
     "health:data_version": "1.0.0",
     "proj:code": "EPSG:4326",
     "sci:doi": "10.5281/zenodo.14987469",
-    "sci:citation": "Metz, M. et al. (2025). ERA5-Land daily: Air temperature at 2 meter above surface (2000–2020) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14987469"
+    "sci:citation": "Metz, M. et al. (2025). ERA5-Land daily: Air temperature at 2 meter above surface (2000–2020) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14987469",
+    "health:keywords": [
+      "air temperature",
+      "ERA5-Land",
+      "reanalysis",
+      "daily",
+      "2m temperature"
+    ]
   },
   "links": [
     {

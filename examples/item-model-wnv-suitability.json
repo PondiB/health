@@ -73,7 +73,14 @@
     "health:uncertainty_type": "ensemble_spread",
     "health:data_version": "1.0.0",
     "proj:code": "EPSG:4326",
-    "sci:citation": "GEOAI4EI Consortium (2024). West Nile Virus Culex suitability model — Europe 2024 [Data set]."
+    "sci:citation": "GEOAI4EI Consortium (2024). West Nile Virus Culex suitability model — Europe 2024 [Data set].",
+    "health:keywords": [
+      "WNV",
+      "West Nile Virus",
+      "Culex",
+      "suitability",
+      "ensemble model"
+    ]
   },
   "links": [
     {

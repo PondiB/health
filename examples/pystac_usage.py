@@ -69,6 +69,7 @@ Required:
   vector_occurrence, host_distribution, covariate, model_output, environmental_sampling
 
 Optional:
+- health:keywords: subject keywords for faceted search (e.g. ["ERA5", "temperature"])
 - health:disease_codes: ICD-10/11 codes (e.g. "A92.3" for WNV, "A98.4" for Ebola)
 - health:pathogen_taxon_ids: NCBI Taxonomy IDs (e.g. "NCBITaxon:11082" for WNV)
 - health:vector_species: GBIF/NCBI taxon IDs for vector species
