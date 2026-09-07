@@ -73,25 +73,24 @@
     "health:uncertainty_type": "ensemble_spread",
     "health:data_version": "1.0.0",
     "proj:code": "EPSG:4326",
-    "sci:doi": "10.5281/zenodo.00000000",
-    "sci:citation": "GEOAI4EI Consortium (2024). West Nile Virus Culex suitability model — Europe 2024 [Data set]. Zenodo."
+    "sci:citation": "GEOAI4EI Consortium (2024). West Nile Virus Culex suitability model — Europe 2024 [Data set]."
   },
   "links": [
     {
       "rel": "self",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-model-wnv-suitability.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-model-wnv-suitability.json"
     },
     {
       "rel": "derived_from",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-temperature.json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-temperature.json",
       "title": "ERA5-Land temperature covariate"
     },
     {
       "rel": "derived_from",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-vegetation.json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-vegetation.json",
       "title": "VIIRS vegetation covariate"
     }
   ],
