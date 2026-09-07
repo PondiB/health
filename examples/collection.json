@@ -83,29 +83,29 @@
     {
       "rel": "self",
       "type": "application/json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/collection.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/collection.json"
     },
     {
       "rel": "root",
       "type": "application/json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/collection.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/collection.json"
     },
     {
       "rel": "item",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-temperature.json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-temperature.json",
       "title": "ERA5-Land daily air temperature"
     },
     {
       "rel": "item",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-precipitation.json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-precipitation.json",
       "title": "ERA5 precipitation Fourier-processed"
     },
     {
       "rel": "item",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-covariate-vegetation.json",
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-covariate-vegetation.json",
       "title": "VIIRS Fourier-processed vegetation"
     },
     {

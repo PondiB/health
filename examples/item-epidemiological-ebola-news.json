@@ -67,7 +67,7 @@
     {
       "rel": "self",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-epidemiological-ebola-news.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-epidemiological-ebola-news.json"
     }
   ],
   "assets": {

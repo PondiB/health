@@ -69,7 +69,7 @@
     {
       "rel": "self",
       "type": "application/geo+json",
-      "href": "https://raw.githubusercontent.com/PondiB/health/geoai4ei/examples/item-epidemiological-rvf.json"
+      "href": "https://raw.githubusercontent.com/PondiB/health/main/examples/item-epidemiological-rvf.json"
     }
   ],
   "assets": {
