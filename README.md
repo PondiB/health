@@ -353,6 +353,113 @@ The disease scenario coverage table (RVF, CCHF, Ebola, HPAI, WNV, TBE, Hanta, MP
 and the ICD-10 / NCBI Taxonomy mappings in the examples serve as few-shot references
 for LLMs populating or querying `health:disease_codes` and `health:pathogen_taxon_ids`.
 
+### 4. Retrieval-Augmented Generation (RAG) with LangChain
+
+A RAG pipeline lets researchers query the catalogue in natural language
+(e.g. *"What mosquito data do we have for Scandinavia?"*) and get back the
+matching STAC Items with an LLM-generated explanation.
+
+**Indexing** — load each STAC Item as a LangChain `Document`.
+Embed the human-readable fields (`title`, `description`, `health:keywords`)
+and store the structured `health:` fields as metadata for filtered retrieval:
+
+```python
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.schema import Document
+import json, glob
+
+docs = []
+for path in glob.glob("examples/item-*.json"):
+    item = json.load(open(path))
+    props = item["properties"]
+
+    text = f"{props.get('title', '')}\n{props.get('description', '')}"
+    if props.get("health:keywords"):
+        text += f"\nKeywords: {', '.join(props['health:keywords'])}"
+
+    docs.append(Document(
+        page_content=text,
+        metadata={
+            "id": item["id"],
+            "data_type": props.get("health:data_type"),
+            "disease_codes": props.get("health:disease_codes", []),
+            "spatial_coverage": props.get("health:spatial_coverage", []),
+            "temporal_resolution": props.get("health:temporal_resolution"),
+            "access_level": props.get("health:access_level"),
+        },
+    ))
+
+vectorstore = Chroma.from_documents(docs, HuggingFaceEmbeddings())
+```
+
+**Hybrid retrieval** — combine vector similarity with metadata filters
+using LangChain's `SelfQueryRetriever`. The LLM translates a
+natural-language question into structured filters over the `health:` enums
+*before* ranking by semantic similarity:
+
+```python
+from langchain.retrievers import SelfQueryRetriever
+
+metadata_field_info = [
+    {"name": "data_type", "type": "string",
+     "description": "case_reports | vector_occurrence | host_distribution "
+                    "| covariate | model_output | environmental_sampling"},
+    {"name": "spatial_coverage", "type": "list[string]",
+     "description": "ISO 3166-1 alpha-3 country codes, e.g. DEU, FRA, SWE"},
+    {"name": "disease_codes", "type": "list[string]",
+     "description": "ICD-10 codes, e.g. A92.4 (RVF), A92.3 (WNV)"},
+    {"name": "access_level", "type": "string",
+     "description": "open | registered | controlled_access | consortium_only"},
+    {"name": "temporal_resolution", "type": "string",
+     "description": "event | daily | weekly | monthly | annual | multi_year"},
+]
+
+retriever = SelfQueryRetriever.from_llm(
+    llm=llm,
+    vectorstore=vectorstore,
+    document_contents="Geospatial epidemic-intelligence dataset metadata",
+    metadata_field_info=metadata_field_info,
+)
+```
+
+**Generation** — pass the retrieved items plus the Health schema context to
+the LLM for a grounded answer:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system",
+     "You are an epidemic-intelligence catalogue assistant. "
+     "Answer questions about available STAC Health datasets. "
+     "Key codes: A92.4=RVF, A92.3=WNV, A98.0=CCHF, A98.4=Ebola, J09=HPAI."),
+    ("human", "Catalogue records:\n{context}\n\nQuestion: {question}"),
+])
+
+rag_chain = (
+    {"context": retriever, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+rag_chain.invoke("Which datasets cover Rift Valley Fever?")
+```
+
+The Health extension's controlled vocabularies (`data_type`, `access_level`,
+`disease_codes`, `spatial_coverage`) work especially well as metadata
+facets because the LLM can map natural language to enum values
+(e.g. *"open-access tick data in France"* → `access_level == "open"` and
+`"FRA" in spatial_coverage`).
+
+For production catalogues with thousands of items, replace Chroma with a
+scalable backend (pgvector, Qdrant) and pull items from a STAC API rather
+than local JSON files. Respect `health:access_level` and
+`health:gdpr_status` during retrieval to enforce data-access policies.
+
 ## Contributing
 
 All contributions are subject to the
