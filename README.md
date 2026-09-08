@@ -280,27 +280,9 @@ See [`examples/pystac_usage.py`](examples/pystac_usage.py) for a full runnable s
 ## LLM Integration
 
 The Health extension schema is designed to be machine-readable for LLM-powered search and
-cataloguing workflows. There are three integration patterns:
+cataloguing workflows.
 
-### 1. Structured search via tool use
-
-Give the LLM the field names and enum values as a tool definition. The LLM translates
-natural-language queries into structured filters:
-
-```text
-User: "Find precipitation data for France and Germany"
-
-LLM tool call → search_stac(
-    data_type="covariate",
-    spatial_coverage=["FRA", "DEU"],
-    keywords=["precipitation"]
-)
-```
-
-The schema's controlled vocabularies (`data_type`, `access_level`, `temporal_resolution`)
-map directly to tool parameters with enum constraints.
-
-### 2. Metadata generation from descriptions
+### 1. Metadata generation from descriptions
 
 An LLM can populate `health:` fields from a dataset's free-text description:
 
@@ -316,44 +298,12 @@ Output: {
 ```
 
 Feed the LLM the Data Type enum table and MOOD crosswalk as context to produce
-valid field values.
+valid field values. The disease scenario coverage table (RVF, CCHF, Ebola, HPAI,
+WNV, TBE, Hanta, MPOX) and the ICD-10 / NCBI Taxonomy mappings in the examples
+serve as few-shot references for LLMs populating `health:disease_codes` and
+`health:pathogen_taxon_ids`.
 
-### 3. Schema as system prompt context
-
-When building an agent that manages a STAC catalogue, include the field table and
-enum values in the system prompt. The 16-field schema is compact enough to fit
-without excessive token overhead:
-
-```python
-HEALTH_SCHEMA_CONTEXT = """
-health:data_type (REQUIRED): one of case_reports, mortality, incidence_rate,
-  mortality_rate, vector_occurrence, host_distribution, covariate,
-  model_output, environmental_sampling
-health:keywords: subject keywords for faceted search, e.g. ["ERA5", "temperature"]
-health:disease_codes: ICD-10/11 codes, e.g. ["A92.3"] for WNV
-health:pathogen_taxon_ids: NCBI Taxonomy IDs, e.g. ["NCBITaxon:11082"]
-health:vector_species: GBIF/NCBI taxon IDs for vectors
-health:spatial_unit: grid_1km, NUTS3, national, etc.
-health:temporal_resolution: event, daily, weekly, monthly, annual, multi_year
-health:week_system: iso_8601, ecdc, mmwr (required when weekly)
-health:spatial_coverage: ISO 3166-1 alpha-3 codes, e.g. ["DEU", "FRA"]
-health:access_level: open, registered, controlled_access, consortium_only
-health:gdpr_status: open_data, aggregated_published, anonymised,
-  pseudonymised, restricted_identifiable
-health:data_version: publisher version string
-health:data_source_system: source registry (era5_land, gbif, cirad)
-health:data_as_of: RFC 3339 snapshot datetime
-health:completeness_score: 0-1 fraction
-health:uncertainty_type: none, prediction_interval, posterior_variance,
-  ensemble_spread
-"""
-```
-
-The disease scenario coverage table (RVF, CCHF, Ebola, HPAI, WNV, TBE, Hanta, MPOX)
-and the ICD-10 / NCBI Taxonomy mappings in the examples serve as few-shot references
-for LLMs populating or querying `health:disease_codes` and `health:pathogen_taxon_ids`.
-
-### 4. Retrieval-Augmented Generation (RAG) with LangChain
+### 2. Retrieval-Augmented Generation (RAG) with LangChain
 
 A RAG pipeline lets researchers query the catalogue in natural language
 (e.g. *"What mosquito data do we have for Scandinavia?"*) and get back the
@@ -459,7 +409,7 @@ For smaller catalogues or offline prototypes the approach above works
 as-is. For production deployments backed by a STAC API, see the next
 section.
 
-### 5. Production RAG with stac-fastapi-pgstac
+### 3. Production RAG with stac-fastapi-pgstac
 
 When the catalogue is served by
 [stac-fastapi-pgstac](https://github.com/stac-utils/stac-fastapi-pgstac),
