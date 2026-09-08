@@ -55,7 +55,14 @@
     "health:data_version": "2.0.0",
     "proj:code": "EPSG:4326",
     "sci:doi": "10.5281/zenodo.16644554",
-    "sci:citation": "Wint, W. et al. (2024). 2010–2024 ERA5 Precipitation Rainfall Fourier Processed 1k ER [Data set]. Zenodo. https://doi.org/10.5281/zenodo.16644554"
+    "sci:citation": "Wint, W. et al. (2024). 2010–2024 ERA5 Precipitation Rainfall Fourier Processed 1k ER [Data set]. Zenodo. https://doi.org/10.5281/zenodo.16644554",
+    "health:keywords": [
+      "precipitation",
+      "ERA5",
+      "rainfall",
+      "Fourier processed",
+      "TFA"
+    ]
   },
   "links": [
     {

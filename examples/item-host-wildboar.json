@@ -66,7 +66,15 @@
     "health:access_level": "consortium_only",
     "health:gdpr_status": "open_data",
     "health:data_source_system": "inrae",
-    "proj:code": "EPSG:4326"
+    "proj:code": "EPSG:4326",
+    "health:keywords": [
+      "Sus scrofa",
+      "wild boar",
+      "host",
+      "ASF",
+      "TBE",
+      "HPAI"
+    ]
   },
   "links": [
     {

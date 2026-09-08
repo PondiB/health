@@ -68,7 +68,14 @@
     "health:access_level": "consortium_only",
     "health:gdpr_status": "open_data",
     "health:data_source_system": "cirad",
-    "proj:code": "EPSG:4326"
+    "proj:code": "EPSG:4326",
+    "health:keywords": [
+      "Microtus arvalis",
+      "common vole",
+      "rodent",
+      "hantavirus",
+      "tularaemia"
+    ]
   },
   "links": [
     {

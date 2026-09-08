@@ -70,7 +70,14 @@
     "health:gdpr_status": "open_data",
     "health:data_source_system": "gbif",
     "health:completeness_score": 0.7,
-    "proj:code": "EPSG:4326"
+    "proj:code": "EPSG:4326",
+    "health:keywords": [
+      "Aedes sticticus",
+      "mosquito",
+      "flood-water",
+      "vector",
+      "suitability"
+    ]
   },
   "links": [
     {

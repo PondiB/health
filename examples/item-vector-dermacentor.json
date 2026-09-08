@@ -70,7 +70,14 @@
     "health:gdpr_status": "open_data",
     "health:data_source_system": "cirad",
     "health:completeness_score": 0.6,
-    "proj:code": "EPSG:4326"
+    "proj:code": "EPSG:4326",
+    "health:keywords": [
+      "Dermacentor reticulatus",
+      "tick",
+      "ornate cow tick",
+      "vector",
+      "CCHF"
+    ]
   },
   "links": [
     {

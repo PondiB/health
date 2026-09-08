@@ -55,7 +55,16 @@
     "health:data_version": "3.0.0",
     "proj:code": "EPSG:4326",
     "sci:doi": "10.5281/zenodo.15434042",
-    "sci:citation": "Wint, W. et al. (2024). 2012–2024 VIIRS Fourier Processed 1k ER [Data set]. Zenodo. https://doi.org/10.5281/zenodo.15434042"
+    "sci:citation": "Wint, W. et al. (2024). 2012–2024 VIIRS Fourier Processed 1k ER [Data set]. Zenodo. https://doi.org/10.5281/zenodo.15434042",
+    "health:keywords": [
+      "VIIRS",
+      "Fourier processed",
+      "TFA",
+      "NDVI",
+      "EVI",
+      "LST",
+      "vegetation"
+    ]
   },
   "links": [
     {
