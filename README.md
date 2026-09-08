@@ -280,27 +280,9 @@ See [`examples/pystac_usage.py`](examples/pystac_usage.py) for a full runnable s
 ## LLM Integration
 
 The Health extension schema is designed to be machine-readable for LLM-powered search and
-cataloguing workflows. There are three integration patterns:
+cataloguing workflows.
 
-### 1. Structured search via tool use
-
-Give the LLM the field names and enum values as a tool definition. The LLM translates
-natural-language queries into structured filters:
-
-```text
-User: "Find precipitation data for France and Germany"
-
-LLM tool call → search_stac(
-    data_type="covariate",
-    spatial_coverage=["FRA", "DEU"],
-    keywords=["precipitation"]
-)
-```
-
-The schema's controlled vocabularies (`data_type`, `access_level`, `temporal_resolution`)
-map directly to tool parameters with enum constraints.
-
-### 2. Metadata generation from descriptions
+### 1. Metadata generation from descriptions
 
 An LLM can populate `health:` fields from a dataset's free-text description:
 
@@ -316,42 +298,281 @@ Output: {
 ```
 
 Feed the LLM the Data Type enum table and MOOD crosswalk as context to produce
-valid field values.
+valid field values. The disease scenario coverage table (RVF, CCHF, Ebola, HPAI,
+WNV, TBE, Hanta, MPOX) and the ICD-10 / NCBI Taxonomy mappings in the examples
+serve as few-shot references for LLMs populating `health:disease_codes` and
+`health:pathogen_taxon_ids`.
 
-### 3. Schema as system prompt context
+### 2. Retrieval-Augmented Generation (RAG) with LangChain
 
-When building an agent that manages a STAC catalogue, include the field table and
-enum values in the system prompt. The 16-field schema is compact enough to fit
-without excessive token overhead:
+A RAG pipeline lets researchers query the catalogue in natural language
+(e.g. *"What mosquito data do we have for Scandinavia?"*) and get back the
+matching STAC Items with an LLM-generated explanation.
+
+**Indexing** — load each STAC Item as a LangChain `Document`.
+Embed the human-readable fields (`title`, `description`, `health:keywords`)
+and store the structured `health:` fields as metadata for filtered retrieval:
 
 ```python
-HEALTH_SCHEMA_CONTEXT = """
-health:data_type (REQUIRED): one of case_reports, mortality, incidence_rate,
-  mortality_rate, vector_occurrence, host_distribution, covariate,
-  model_output, environmental_sampling
-health:keywords: subject keywords for faceted search, e.g. ["ERA5", "temperature"]
-health:disease_codes: ICD-10/11 codes, e.g. ["A92.3"] for WNV
-health:pathogen_taxon_ids: NCBI Taxonomy IDs, e.g. ["NCBITaxon:11082"]
-health:vector_species: GBIF/NCBI taxon IDs for vectors
-health:spatial_unit: grid_1km, NUTS3, national, etc.
-health:temporal_resolution: event, daily, weekly, monthly, annual, multi_year
-health:week_system: iso_8601, ecdc, mmwr (required when weekly)
-health:spatial_coverage: ISO 3166-1 alpha-3 codes, e.g. ["DEU", "FRA"]
-health:access_level: open, registered, controlled_access, consortium_only
-health:gdpr_status: open_data, aggregated_published, anonymised,
-  pseudonymised, restricted_identifiable
-health:data_version: publisher version string
-health:data_source_system: source registry (era5_land, gbif, cirad)
-health:data_as_of: RFC 3339 snapshot datetime
-health:completeness_score: 0-1 fraction
-health:uncertainty_type: none, prediction_interval, posterior_variance,
-  ensemble_spread
-"""
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.schema import Document
+import json, glob
+
+docs = []
+for path in glob.glob("examples/item-*.json"):
+    item = json.load(open(path))
+    props = item["properties"]
+
+    text = f"{props.get('title', '')}\n{props.get('description', '')}"
+    if props.get("health:keywords"):
+        text += f"\nKeywords: {', '.join(props['health:keywords'])}"
+
+    docs.append(Document(
+        page_content=text,
+        metadata={
+            "id": item["id"],
+            "data_type": props.get("health:data_type"),
+            "disease_codes": props.get("health:disease_codes", []),
+            "spatial_coverage": props.get("health:spatial_coverage", []),
+            "temporal_resolution": props.get("health:temporal_resolution"),
+            "access_level": props.get("health:access_level"),
+        },
+    ))
+
+vectorstore = Chroma.from_documents(docs, HuggingFaceEmbeddings())
 ```
 
-The disease scenario coverage table (RVF, CCHF, Ebola, HPAI, WNV, TBE, Hanta, MPOX)
-and the ICD-10 / NCBI Taxonomy mappings in the examples serve as few-shot references
-for LLMs populating or querying `health:disease_codes` and `health:pathogen_taxon_ids`.
+**Hybrid retrieval** — combine vector similarity with metadata filters
+using LangChain's `SelfQueryRetriever`. The LLM translates a
+natural-language question into structured filters over the `health:` enums
+*before* ranking by semantic similarity:
+
+```python
+from langchain.retrievers import SelfQueryRetriever
+
+metadata_field_info = [
+    {"name": "data_type", "type": "string",
+     "description": "case_reports | vector_occurrence | host_distribution "
+                    "| covariate | model_output | environmental_sampling"},
+    {"name": "spatial_coverage", "type": "list[string]",
+     "description": "ISO 3166-1 alpha-3 country codes, e.g. DEU, FRA, SWE"},
+    {"name": "disease_codes", "type": "list[string]",
+     "description": "ICD-10 codes, e.g. A92.4 (RVF), A92.3 (WNV)"},
+    {"name": "access_level", "type": "string",
+     "description": "open | registered | controlled_access | consortium_only"},
+    {"name": "temporal_resolution", "type": "string",
+     "description": "event | daily | weekly | monthly | annual | multi_year"},
+]
+
+retriever = SelfQueryRetriever.from_llm(
+    llm=llm,
+    vectorstore=vectorstore,
+    document_contents="Geospatial epidemic-intelligence dataset metadata",
+    metadata_field_info=metadata_field_info,
+)
+```
+
+**Generation** — pass the retrieved items plus the Health schema context to
+the LLM for a grounded answer:
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system",
+     "You are an epidemic-intelligence catalogue assistant. "
+     "Answer questions about available STAC Health datasets. "
+     "Key codes: A92.4=RVF, A92.3=WNV, A98.0=CCHF, A98.4=Ebola, J09=HPAI."),
+    ("human", "Catalogue records:\n{context}\n\nQuestion: {question}"),
+])
+
+rag_chain = (
+    {"context": retriever, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+rag_chain.invoke("Which datasets cover Rift Valley Fever?")
+```
+
+The Health extension's controlled vocabularies (`data_type`, `access_level`,
+`disease_codes`, `spatial_coverage`) work especially well as metadata
+facets because the LLM can map natural language to enum values
+(e.g. *"open-access tick data in France"* → `access_level == "open"` and
+`"FRA" in spatial_coverage`).
+
+For smaller catalogues or offline prototypes the approach above works
+as-is. For production deployments backed by a STAC API, see the next
+section.
+
+### 3. Production RAG with stac-fastapi-pgstac
+
+When the catalogue is served by
+[stac-fastapi-pgstac](https://github.com/stac-utils/stac-fastapi-pgstac),
+PgSTAC already provides CQL2 filtering over JSONB properties, PostGIS
+spatial indexing, and temporal range queries — so the RAG architecture
+shifts from *embed-then-search* to **LLM-as-query-translator**:
+
+```text
+User question (natural language)
+        │
+        ▼
+   ┌─────────┐   CQL2 filter + bbox/datetime     ┌──────────────────┐
+   │   LLM   │ ─────────────────────────────────▶ │ stac-fastapi     │
+   │ (agent) │                                    │   + pgstac       │
+   └─────────┘                                    │  (PostgreSQL)    │
+        ▲                                         └──────┬───────────┘
+        │   matched STAC Items (JSON)                    │
+        └────────────────────────────────────────────────┘
+        │
+        ▼
+   LLM generates grounded answer from retrieved Items
+```
+
+The LLM translates natural language into structured CQL2 filters and
+calls the STAC API directly. PgSTAC handles spatial intersection,
+temporal range, and exact filtering on `health:` fields stored in JSONB.
+
+**Define the STAC search as a LangChain tool:**
+
+```python
+import httpx
+from langchain_core.tools import tool
+
+STAC_API = "https://your-stac-api.example.com"
+
+@tool
+def search_stac_catalogue(
+    data_type: str = None,
+    disease_codes: list[str] = None,
+    spatial_coverage: list[str] = None,
+    temporal_resolution: str = None,
+    access_level: str = None,
+    bbox: list[float] = None,
+    datetime_range: str = None,
+    limit: int = 10,
+) -> str:
+    """Search the STAC Health catalogue via the pgstac-backed API.
+
+    Args:
+        data_type: case_reports, vector_occurrence, host_distribution,
+                   covariate, model_output, environmental_sampling
+        disease_codes: ICD-10 codes, e.g. ["A92.4"] for RVF
+        spatial_coverage: ISO 3166-1 alpha-3, e.g. ["FRA", "DEU"]
+        temporal_resolution: daily, weekly, monthly, annual, multi_year
+        access_level: open, registered, controlled_access, consortium_only
+        bbox: [west, south, east, north] in EPSG:4326
+        datetime_range: RFC 3339 range, e.g. "2020-01-01/2024-12-31"
+        limit: max items to return
+    """
+    filters = []
+    if data_type:
+        filters.append({
+            "op": "=",
+            "args": [{"property": "health:data_type"}, data_type],
+        })
+    if disease_codes:
+        for code in disease_codes:
+            filters.append({
+                "op": "a_contains",
+                "args": [{"property": "health:disease_codes"}, [code]],
+            })
+    if spatial_coverage:
+        for country in spatial_coverage:
+            filters.append({
+                "op": "a_contains",
+                "args": [{"property": "health:spatial_coverage"}, [country]],
+            })
+    if temporal_resolution:
+        filters.append({
+            "op": "=",
+            "args": [{"property": "health:temporal_resolution"}, temporal_resolution],
+        })
+    if access_level:
+        filters.append({
+            "op": "=",
+            "args": [{"property": "health:access_level"}, access_level],
+        })
+
+    body = {"limit": limit}
+    if bbox:
+        body["bbox"] = bbox
+    if datetime_range:
+        body["datetime"] = datetime_range
+    if filters:
+        body["filter"] = (
+            {"op": "and", "args": filters} if len(filters) > 1 else filters[0]
+        )
+        body["filter-lang"] = "cql2-json"
+
+    resp = httpx.post(f"{STAC_API}/search", json=body)
+    resp.raise_for_status()
+    features = resp.json().get("features", [])
+
+    results = []
+    for item in features:
+        props = item["properties"]
+        results.append(
+            f"- **{props.get('title', item['id'])}**\n"
+            f"  type={props.get('health:data_type')} | "
+            f"diseases={props.get('health:disease_codes', [])} | "
+            f"countries={props.get('health:spatial_coverage', [])} | "
+            f"access={props.get('health:access_level')}"
+        )
+    return "\n".join(results) if results else "No matching datasets found."
+```
+
+**Wire up the agent:**
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import AgentExecutor, create_tool_calling_agent
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system",
+     "You are a GEOAI4EI catalogue assistant backed by a STAC API "
+     "with the Health extension. Use the search tool to find datasets, "
+     "then answer the user's question based on the results.\n\n"
+     "Key disease codes: A92.4=RVF, A92.3=WNV, A98.0=CCHF, "
+     "A98.4=Ebola, J09=HPAI.\n"
+     "Countries use ISO 3166-1 alpha-3 (FRA, DEU, SWE, etc.)."),
+    ("human", "{input}"),
+    ("placeholder", "{agent_scratchpad}"),
+])
+
+agent = create_tool_calling_agent(llm, [search_stac_catalogue], prompt)
+executor = AgentExecutor(agent=agent, tools=[search_stac_catalogue])
+
+executor.invoke({"input": "What Rift Valley Fever data do we have?"})
+executor.invoke({"input": "Find open-access daily covariates covering France"})
+```
+
+**Why pgstac-backed retrieval over a standalone vector store:**
+
+| Concern | Vector store RAG | pgstac-backed agent |
+| --- | --- | --- |
+| Structured filtering | Approximate metadata filters | Exact CQL2 on indexed JSONB |
+| Spatial queries | Not supported | PostGIS bbox / intersects |
+| Temporal range | Stored as text metadata | First-class datetime indexing |
+| Data freshness | Must re-index on changes | Always queries live catalogue |
+| Scale | ~100K documents typical | Hundreds of millions of items |
+
+**When to add a vector layer on top:**
+For fuzzy semantic queries that CQL2 cannot express
+(e.g. *"datasets related to climate-driven disease emergence"*),
+add a [pgvector](https://github.com/pgvector/pgvector) column alongside
+PgSTAC in the same PostgreSQL instance. Embed `title + description +
+health:keywords` into the vector column, then combine CQL2 structured
+filters with pgvector similarity ranking in a single query. This gives
+exact structured retrieval and semantic search in one database.
+
+Respect `health:access_level` and `health:gdpr_status` during retrieval
+to enforce data-access policies — filter out `restricted_identifiable`
+items unless the requesting user is authorised.
 
 ## Contributing
 
