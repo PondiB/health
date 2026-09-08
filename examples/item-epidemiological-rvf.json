@@ -63,7 +63,15 @@
     "health:gdpr_status": "pseudonymised",
     "health:data_source_system": "cirad",
     "health:data_version": "1.0.0",
-    "proj:code": "EPSG:4326"
+    "proj:code": "EPSG:4326",
+    "health:keywords": [
+      "RVF",
+      "Rift Valley Fever",
+      "Mauritania",
+      "Senegal",
+      "epidemic",
+      "case reports"
+    ]
   },
   "links": [
     {

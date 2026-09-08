@@ -55,7 +55,13 @@
     "health:data_version": "1.0.0",
     "proj:code": "EPSG:4326",
     "sci:doi": "10.5281/zenodo.14045027",
-    "sci:citation": "Wint, W. et al. (2024). 2010–2023 RelativeHumidity ERA5 Fourier Processed 1k [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14045027"
+    "sci:citation": "Wint, W. et al. (2024). 2010–2023 RelativeHumidity ERA5 Fourier Processed 1k [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14045027",
+    "health:keywords": [
+      "relative humidity",
+      "ERA5",
+      "Fourier processed",
+      "TFA"
+    ]
   },
   "links": [
     {

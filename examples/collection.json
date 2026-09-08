@@ -113,5 +113,15 @@
       "href": "https://creativecommons.org/licenses/by/4.0/",
       "title": "CC BY 4.0"
     }
+  ],
+  "health:keywords": [
+    "covariate",
+    "ERA5",
+    "VIIRS",
+    "MODIS",
+    "Fourier processed",
+    "climate",
+    "vegetation",
+    "epidemic-intelligence"
   ]
 }

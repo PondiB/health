@@ -89,6 +89,7 @@ The fields in the table below can be used in these parts of STAC documents:
 | Field Name | Type | Description |
 | --- | --- | --- |
 | health:data_type | [Data Type](#data-type) | **REQUIRED** (Item). Semantic class of the record. |
+| health:keywords | \[string] | Subject keywords for faceted search (e.g. `["ERA5", "temperature", "reanalysis"]`). |
 | health:disease_codes | \[string] | ICD-10/11 (or equivalent) disease/condition codes. |
 | health:pathogen_taxon_ids | \[string] | NCBI Taxonomy IDs (or CURIE form). |
 | health:vector_species | \[string] | GBIF or NCBI taxon IDs for vector species. |
@@ -185,8 +186,8 @@ map to STAC fields as follows:
 | Data type (format) | Asset `type` (media type) |
 | CRS (EPSG) | `proj:code` (Projection extension) |
 | Download and links | `assets` + `links` (core STAC) |
-| Categories | `keywords` (Collection) |
-| Other keywords | `keywords` (Collection) or `description` |
+| Categories | `health:keywords` (Item) or `keywords` (Collection) |
+| Other keywords | `health:keywords` (Item) or `keywords` (Collection) |
 | Language | `description` (note in text) |
 | Status | `health:data_version` |
 | Update frequency | `health:temporal_resolution` |
@@ -328,6 +329,7 @@ HEALTH_SCHEMA_CONTEXT = """
 health:data_type (REQUIRED): one of case_reports, mortality, incidence_rate,
   mortality_rate, vector_occurrence, host_distribution, covariate,
   model_output, environmental_sampling
+health:keywords: subject keywords for faceted search, e.g. ["ERA5", "temperature"]
 health:disease_codes: ICD-10/11 codes, e.g. ["A92.3"] for WNV
 health:pathogen_taxon_ids: NCBI Taxonomy IDs, e.g. ["NCBITaxon:11082"]
 health:vector_species: GBIF/NCBI taxon IDs for vectors

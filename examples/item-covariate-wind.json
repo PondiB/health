@@ -55,7 +55,12 @@
     "health:data_version": "1.0.0",
     "proj:code": "EPSG:4326",
     "sci:doi": "10.5281/zenodo.11182081",
-    "sci:citation": "Wint, W. et al. (2024). 2005–2018 Wind Speed Direction [Data set]. Zenodo. https://doi.org/10.5281/zenodo.11182081"
+    "sci:citation": "Wint, W. et al. (2024). 2005–2018 Wind Speed Direction [Data set]. Zenodo. https://doi.org/10.5281/zenodo.11182081",
+    "health:keywords": [
+      "wind speed",
+      "wind direction",
+      "climate"
+    ]
   },
   "links": [
     {
