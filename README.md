@@ -574,6 +574,250 @@ Respect `health:access_level` and `health:gdpr_status` during retrieval
 to enforce data-access policies — filter out `restricted_identifiable`
 items unless the requesting user is authorised.
 
+### 4. Multi-step Agent with LangGraph
+
+[LangGraph](https://langchain-ai.github.io/langgraph/) enables stateful,
+multi-step agent workflows with cycles and conditional branching. This is
+useful when a single tool call is not enough — for example, an agent that
+searches the catalogue, evaluates whether the results are sufficient,
+refines the query if needed, and then synthesises a final answer.
+
+```text
+         ┌──────────────────────────────┐
+         │          START               │
+         └──────────┬───────────────────┘
+                    ▼
+         ┌──────────────────────────────┐
+         │    plan_query                │
+         │  (parse intent → filters)    │
+         └──────────┬───────────────────┘
+                    ▼
+         ┌──────────────────────────────┐
+         │    search_catalogue          │
+         │  (call STAC API via tool)    │
+         └──────────┬───────────────────┘
+                    ▼
+         ┌──────────────────────────────┐
+         │    evaluate_results          │◀─────┐
+         │  (enough? relevant?)         │      │
+         └──────────┬───────────────────┘      │
+                    │                          │
+              ┌─────┴──────┐                   │
+              │            │                   │
+          sufficient   insufficient            │
+              │            │                   │
+              ▼            ▼                   │
+         ┌─────────┐  ┌────────────┐           │
+         │ respond  │  │  refine    │───────────┘
+         └─────────┘  │  query     │
+                      └────────────┘
+```
+
+**Define the agent state and graph:**
+
+```python
+from typing import TypedDict, Annotated
+from langgraph.graph import StateGraph, END
+
+class CatalogueState(TypedDict):
+    question: str
+    filters: dict
+    results: list[dict]
+    refinement_count: int
+    answer: str
+
+def plan_query(state: CatalogueState) -> CatalogueState:
+    """LLM translates the natural-language question into STAC filters."""
+    from langchain_anthropic import ChatAnthropic
+
+    llm = ChatAnthropic(model="claude-sonnet-5")
+    plan_prompt = (
+        "You are a STAC Health catalogue planner. Given a user question, "
+        "extract structured search filters.\n\n"
+        "Available filters:\n"
+        "- data_type: case_reports | vector_occurrence | host_distribution "
+        "| covariate | model_output | environmental_sampling\n"
+        "- disease_codes: ICD-10 codes (A92.4=RVF, A92.3=WNV, A98.0=CCHF, "
+        "A98.4=Ebola, J09=HPAI, A84=TBE, A98.5=Hanta)\n"
+        "- spatial_coverage: ISO 3166-1 alpha-3 codes\n"
+        "- temporal_resolution: daily | weekly | monthly | annual | multi_year\n"
+        "- access_level: open | registered | controlled_access | consortium_only\n"
+        "- bbox: [west, south, east, north]\n"
+        "- datetime_range: RFC 3339 range\n\n"
+        f"Question: {state['question']}\n\n"
+        "Return a JSON object with only the relevant filters."
+    )
+    response = llm.invoke(plan_prompt)
+    import json
+    filters = json.loads(response.content)
+    return {"filters": filters, "refinement_count": state.get("refinement_count", 0)}
+
+def search_catalogue(state: CatalogueState) -> CatalogueState:
+    """Call the STAC API with the planned filters."""
+    import httpx
+
+    STAC_API = "https://your-stac-api.example.com"
+    body = {"limit": 10}
+
+    filters = state["filters"]
+    cql_filters = []
+    if filters.get("data_type"):
+        cql_filters.append({
+            "op": "=",
+            "args": [{"property": "health:data_type"}, filters["data_type"]],
+        })
+    if filters.get("disease_codes"):
+        for code in filters["disease_codes"]:
+            cql_filters.append({
+                "op": "a_contains",
+                "args": [{"property": "health:disease_codes"}, [code]],
+            })
+    if filters.get("spatial_coverage"):
+        for country in filters["spatial_coverage"]:
+            cql_filters.append({
+                "op": "a_contains",
+                "args": [{"property": "health:spatial_coverage"}, [country]],
+            })
+    if filters.get("temporal_resolution"):
+        cql_filters.append({
+            "op": "=",
+            "args": [
+                {"property": "health:temporal_resolution"},
+                filters["temporal_resolution"],
+            ],
+        })
+    if filters.get("access_level"):
+        cql_filters.append({
+            "op": "=",
+            "args": [{"property": "health:access_level"}, filters["access_level"]],
+        })
+    if filters.get("bbox"):
+        body["bbox"] = filters["bbox"]
+    if filters.get("datetime_range"):
+        body["datetime"] = filters["datetime_range"]
+    if cql_filters:
+        body["filter"] = (
+            {"op": "and", "args": cql_filters}
+            if len(cql_filters) > 1
+            else cql_filters[0]
+        )
+        body["filter-lang"] = "cql2-json"
+
+    resp = httpx.post(f"{STAC_API}/search", json=body)
+    resp.raise_for_status()
+    features = resp.json().get("features", [])
+
+    results = []
+    for item in features:
+        props = item["properties"]
+        results.append({
+            "id": item["id"],
+            "title": props.get("title", item["id"]),
+            "data_type": props.get("health:data_type"),
+            "disease_codes": props.get("health:disease_codes", []),
+            "spatial_coverage": props.get("health:spatial_coverage", []),
+            "access_level": props.get("health:access_level"),
+            "temporal_resolution": props.get("health:temporal_resolution"),
+        })
+    return {"results": results}
+
+def evaluate_results(state: CatalogueState) -> CatalogueState:
+    """LLM decides whether the results sufficiently answer the question."""
+    return state
+
+def should_refine(state: CatalogueState) -> str:
+    """Route to 'refine' if results are empty and we haven't retried too much."""
+    if not state["results"] and state.get("refinement_count", 0) < 2:
+        return "refine"
+    return "respond"
+
+def refine_query(state: CatalogueState) -> CatalogueState:
+    """Broaden the filters — drop the most restrictive constraint."""
+    from langchain_anthropic import ChatAnthropic
+    import json
+
+    llm = ChatAnthropic(model="claude-sonnet-5")
+    refine_prompt = (
+        "The STAC catalogue search returned no results with these filters:\n"
+        f"{json.dumps(state['filters'], indent=2)}\n\n"
+        f"Original question: {state['question']}\n\n"
+        "Relax the filters to broaden the search. Remove or loosen the "
+        "most restrictive constraint while keeping the query relevant. "
+        "Return the revised JSON filters."
+    )
+    response = llm.invoke(refine_prompt)
+    filters = json.loads(response.content)
+    return {
+        "filters": filters,
+        "refinement_count": state.get("refinement_count", 0) + 1,
+    }
+
+def respond(state: CatalogueState) -> CatalogueState:
+    """Generate a final grounded answer from the retrieved items."""
+    from langchain_anthropic import ChatAnthropic
+    import json
+
+    llm = ChatAnthropic(model="claude-sonnet-5")
+    context = json.dumps(state["results"], indent=2) if state["results"] else "No datasets found."
+    response = llm.invoke(
+        "You are an epidemic-intelligence catalogue assistant. "
+        "Answer the question based on these STAC Health catalogue results.\n\n"
+        f"Results:\n{context}\n\n"
+        f"Question: {state['question']}"
+    )
+    return {"answer": response.content}
+
+# Build the graph
+graph = StateGraph(CatalogueState)
+graph.add_node("plan_query", plan_query)
+graph.add_node("search_catalogue", search_catalogue)
+graph.add_node("evaluate_results", evaluate_results)
+graph.add_node("refine_query", refine_query)
+graph.add_node("respond", respond)
+
+graph.set_entry_point("plan_query")
+graph.add_edge("plan_query", "search_catalogue")
+graph.add_edge("search_catalogue", "evaluate_results")
+graph.add_conditional_edges("evaluate_results", should_refine, {
+    "refine": "refine_query",
+    "respond": "respond",
+})
+graph.add_edge("refine_query", "search_catalogue")
+graph.add_edge("respond", END)
+
+app = graph.compile()
+```
+
+**Run the agent:**
+
+```python
+result = app.invoke({"question": "What tick vector data do we have for Central Europe?"})
+print(result["answer"])
+
+result = app.invoke({
+    "question": "Find open-access daily temperature covariates covering France and Germany"
+})
+print(result["answer"])
+```
+
+**When to use LangGraph over the simpler LangChain agent (section 3):**
+
+| Concern | LangChain AgentExecutor | LangGraph |
+| --- | --- | --- |
+| Simple single-tool queries | Sufficient | Overkill |
+| Multi-step reasoning with retries | Limited control | Explicit conditional edges |
+| Custom evaluation / refinement loops | Hard to customise | Built-in cycles |
+| Streaming intermediate steps | Basic | First-class support |
+| Human-in-the-loop approval | Requires workarounds | Native interrupt/resume |
+| Checkpointing and recovery | Not built-in | Persistent state via checkpointers |
+
+For most catalogue search tasks, the LangChain agent in section 3 is
+sufficient. Use LangGraph when you need query refinement loops,
+multi-source aggregation (e.g. searching STAC + an external disease
+database, then joining results), or human-in-the-loop approval before
+returning results with `controlled_access` or `restricted_identifiable`
+data.
+
 ## Contributing
 
 All contributions are subject to the
